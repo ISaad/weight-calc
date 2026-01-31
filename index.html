@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1RM Calculator | Weighted Calisthenics & Strength</title>
+    <meta name="description"
+        content="Calculate your One Rep Max (1RM) for weighted calisthenics and barbell lifts using RPE. Store your data locally and explore the RPE table.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1>KING <span class="accent-text">CALC</span></h1>
+            <p class="subtitle">Premium 1RM & RPE Table for Streetlifters</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Main Calculator Section -->
+        <section class="calc-section">
+            <div class="card glass">
+                <div class="card-header">
+                    <h2>Calculator</h2>
+                    <div class="toggle-container">
+                        <span class="toggle-label">Weighted</span>
+                        <label class="switch">
+                            <input type="checkbox" id="mode-toggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid-inputs">
+                    <div class="input-group" id="bw-group">
+                        <label for="bodyweight">Bodyweight (kg)</label>
+                        <input type="number" id="bodyweight" placeholder="e.g. 75" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="added-weight" id="weight-label">Added Weight (kg)</label>
+                        <input type="number" id="added-weight" placeholder="e.g. 40" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="reps">Reps</label>
+                        <input type="number" id="reps" placeholder="e.g. 5" min="1" max="15">
+                    </div>
+                    <div class="input-group">
+                        <label for="rpe">RPE</label>
+                        <select id="rpe">
+                            <option value="10">10 (Max Effort)</option>
+                            <option value="9.5">9.5 (Maybe 1 more)</option>
+                            <option value="9">9 (1 Rep in Reserve)</option>
+                            <option value="8.5">8.5 (Maybe 2 more)</option>
+                            <option value="8">8 (2 Reps in Reserve)</option>
+                            <option value="7.5">7.5 (Maybe 3 more)</option>
+                            <option value="7">7 (3 Reps in Reserve)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="calculate-btn" class="btn btn-primary">Calculate e1RM</button>
+                    <button id="save-btn" class="btn btn-secondary">Save BW</button>
+                    <button id="reset-btn" class="btn btn-danger" onclick="clearData()">Reset</button>
+                </div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="card result-card glass">
+                <h3>Estimated 1RM</h3>
+                <div class="result-display">
+                    <div class="result-item">
+                        <span class="result-label">Total Max</span>
+                        <span class="result-value" id="total-1rm">--</span>
+                        <span class="unit">kg</span>
+                    </div>
+                    <div class="result-item highlight" id="added-result-item">
+                        <span class="result-label">Added Max</span>
+                        <span class="result-value" id="added-1rm">--</span>
+                        <span class="unit">kg</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RPE Table Section -->
+        <section class="table-section">
+            <div class="card glass overflow-x">
+                <div class="card-header">
+                    <h2>RPE Table Breakdown</h2>
+                    <p class="card-desc">Weights based on your current 1RM</p>
+                </div>
+                <div class="table-container">
+                    <table id="rpe-table">
+                        <thead>
+                            <tr id="table-head-row">
+                                <th>RPE / Reps</th>
+                                <!-- JS will populate reps 1-10 -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- JS will populate rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Info Section -->
+        <section class="info-section">
+            <div class="info-grid">
+                <div class="card glass">
+                    <h3>How it Works</h3>
+                    <p>This calculator uses the <strong>RPE (Rate of Perceived Exertion)</strong> scale combined with
+                        your bodyweight for weighted calisthenics.</p>
+                    <p>In movements like Pull-ups and Dips, your body is part of the load. To find your true max, we
+                        calculate: <br><code>(Added Weight + Bodyweight) / Intensity% = Total Max</code></p>
+                </div>
+                <div class="card glass">
+                    <h3>Metrics Guide</h3>
+                    <ul>
+                        <li><strong>1RM:</strong> The maximum weight you can lift for a single repetition.</li>
+                        <li><strong>RPE 10:</strong> Maximum effort. No reps left in the tank.</li>
+                        <li><strong>RPE 9:</strong> 1 rep left in reserve.</li>
+                        <li><strong>RPE 8:</strong> 2 reps left in reserve.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 King Calc. Built for Streetlifters.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'streetlift-pro-v1';
+const CACHE_NAME = 'streetlift-pro-v2';
 const ASSETS = [
     './',
     './index.html',

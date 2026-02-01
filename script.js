@@ -116,10 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
     initTheme();
     initPWA();
+    initModal(); // Initialize Legal Modal
     updateCalculatorUI();
     renderRoutineTable();
     updateWorkoutDisplay();
 });
+
+// Modal Logic
+function initModal() {
+    const modal = document.getElementById('legal-modal');
+    const trigger = document.getElementById('legal-trigger');
+    const closeBtn = document.querySelector('.close-modal');
+
+    if (!modal || !trigger) return;
+
+    trigger.addEventListener('click', () => {
+        modal.classList.add('show');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.remove('show');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+}
 
 // PWA Logic
 let deferredPrompt;

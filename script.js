@@ -139,6 +139,13 @@ function initPWA() {
         pwaInstallBtn.style.display = 'flex';
     });
 
+    // iOS Detection
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+        // We can't show a button, but we can remind them via a tip
+        console.log("iOS detected: Use Share -> Add to Home Screen");
+    }
+
     pwaInstallBtn.addEventListener('click', () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();

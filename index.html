@@ -4,13 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1RM Calculator | Weighted Calisthenics & Strength</title>
-    <meta name="description"
-        content="Calculate your One Rep Max (1RM) for weighted calisthenics and barbell lifts using RPE. Store your data locally and explore the RPE table.">
+    <title>StreetLift Pro | Premium Streetlifting Performance</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -20,131 +18,178 @@
         <div class="blob blob-2"></div>
     </div>
 
-    <header>
-        <div class="container">
-            <h1>KING <span class="accent-text">CALC</span></h1>
-            <p class="subtitle">Premium 1RM & RPE Table for Streetlifters</p>
-        </div>
+    <!-- Header -->
+    <header class="container">
+        <h1>STREETLIFT <span class="accent-text">PRO</span></h1>
+        <p class="subtitle">Complete Performance Tracking</p>
     </header>
 
     <main class="container">
-        <!-- Main Calculator Section -->
-        <section class="calc-section">
-            <div class="card glass">
-                <div class="card-header">
-                    <h2>Calculator</h2>
-                    <div class="toggle-container">
-                        <span class="toggle-label">Weighted</span>
-                        <label class="switch">
-                            <input type="checkbox" id="mode-toggle" checked>
-                            <span class="slider round"></span>
+
+        <!-- TAB 1: CALCULATOR -->
+        <section id="tab-calculator" class="tab-content active">
+
+            <!-- 1RM Inputs -->
+            <h2>Your 1RM Stats</h2>
+            <div class="rm-tracker glass">
+                <div class="rm-input-group">
+                    <label for="rm-muscleup">Muscle-Up (kg)</label>
+                    <input type="number" id="rm-muscleup" placeholder="0" step="1.25">
+                </div>
+                <div class="rm-input-group">
+                    <label for="rm-dip">Dip (kg)</label>
+                    <input type="number" id="rm-dip" placeholder="0" step="1.25">
+                </div>
+                <div class="rm-input-group">
+                    <label for="rm-squat">Squat (kg)</label>
+                    <input type="number" id="rm-squat" placeholder="0" step="1.25">
+                </div>
+                <div class="rm-input-group">
+                    <label for="rm-pullup">Pull-Up (kg)</label>
+                    <input type="number" id="rm-pullup" placeholder="0" step="1.25">
+                </div>
+            </div>
+
+            <!-- Sub Tabs for Exercises -->
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" data-ex="muscleup">Muscle-Up</button>
+                <button class="sub-tab-btn" data-ex="dip">Dip</button>
+                <button class="sub-tab-btn" data-ex="squat">Squat</button>
+                <button class="sub-tab-btn" data-ex="pullup">Pull-Up</button>
+            </div>
+
+            <!-- The Calculator Module -->
+            <div class="glass">
+                <div class="exercise-header">
+                    <h3 id="calc-title">Muscle-Up Calculator</h3>
+                    <div class="toggle-container" id="weighted-toggle-container">
+                        <label>
+                            <input type="checkbox" id="calc-weighted" checked> Weighted
                         </label>
                     </div>
                 </div>
 
-                <div class="grid-inputs">
-                    <div class="input-group" id="bw-group">
-                        <label for="bodyweight">Bodyweight (kg)</label>
-                        <input type="number" id="bodyweight" placeholder="e.g. 75" step="0.1">
+                <div class="input-group" id="calc-bw-group">
+                    <label>Bodyweight (kg)</label>
+                    <input type="number" id="calc-bw" placeholder="e.g. 75">
+                </div>
+
+                <div class="routine-controls">
+                    <div class="input-group">
+                        <label>Reps</label>
+                        <input type="number" id="calc-reps" placeholder="5">
                     </div>
                     <div class="input-group">
-                        <label for="added-weight" id="weight-label">Added Weight (kg)</label>
-                        <input type="number" id="added-weight" placeholder="e.g. 40" step="0.1">
-                    </div>
-                    <div class="input-group">
-                        <label for="reps">Reps</label>
-                        <input type="number" id="reps" placeholder="e.g. 5" min="1" max="15">
-                    </div>
-                    <div class="input-group">
-                        <label for="rpe">RPE</label>
-                        <select id="rpe">
-                            <option value="10">10 (Max Effort)</option>
-                            <option value="9.5">9.5 (Maybe 1 more)</option>
-                            <option value="9">9 (1 Rep in Reserve)</option>
-                            <option value="8.5">8.5 (Maybe 2 more)</option>
-                            <option value="8">8 (2 Reps in Reserve)</option>
-                            <option value="7.5">7.5 (Maybe 3 more)</option>
-                            <option value="7">7 (3 Reps in Reserve)</option>
+                        <label>RIR</label>
+                        <select id="calc-rir">
+                            <option value="0">0 (Max Effort)</option>
+                            <option value="0.5">0-1 (RPE 9.5)</option>
+                            <option value="1">1 (RPE 9)</option>
+                            <option value="1.5">1-2 (RPE 8.5)</option>
+                            <option value="2">2 (RPE 8)</option>
+                            <option value="2.5">2-3 (RPE 7.5)</option>
+                            <option value="3">3 (RPE 7)</option>
+                            <option value="3.5">3-4 (RPE 6.5)</option>
+                            <option value="4">4 (RPE 6)</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button id="calculate-btn" class="btn btn-primary">Calculate e1RM</button>
-                    <button id="save-btn" class="btn btn-secondary">Save BW</button>
-                    <button id="reset-btn" class="btn btn-danger" onclick="clearData()">Reset</button>
-                </div>
-            </div>
+                <button class="btn btn-primary" id="btn-calculate">Calculate Weight</button>
 
-            <!-- Result Card -->
-            <div class="card result-card glass">
-                <h3>Estimated 1RM</h3>
-                <div class="result-display">
-                    <div class="result-item">
-                        <span class="result-label">Total Max</span>
-                        <span class="result-value" id="total-1rm">--</span>
-                        <span class="unit">kg</span>
-                    </div>
-                    <div class="result-item highlight" id="added-result-item">
-                        <span class="result-label">Added Max</span>
-                        <span class="result-value" id="added-1rm">--</span>
-                        <span class="unit">kg</span>
-                    </div>
+                <!-- Result -->
+                <div class="result-box">
+                    <div class="result-sub">You should lift:</div>
+                    <div class="result-main" id="result-weight">--</span> <span class="unit">kg</div>
+                    <div class="result-sub" id="result-breakdown">Total: -- | Added: --</div>
                 </div>
             </div>
         </section>
 
-        <!-- RPE Table Section -->
-        <section class="table-section">
-            <div class="card glass overflow-x">
-                <div class="card-header">
-                    <h2>RPE Table Breakdown</h2>
-                    <p class="card-desc">Weights based on your current 1RM</p>
+
+        <!-- TAB 2: ROUTINE -->
+        <section id="tab-routine" class="tab-content">
+            <h2>Training Routine</h2>
+            <div class="glass">
+                <div class="routine-controls">
+                    <div class="input-group">
+                        <label>Current Block</label>
+                        <select id="routine-block">
+                            <option value="1">Block 1</option>
+                            <option value="2">Block 2</option>
+                            <option value="3">Block 3</option>
+                            <option value="4">Block 4</option>
+                            <option value="5">Block 5</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Current Week</label>
+                        <select id="routine-week">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <table id="rpe-table">
+
+                <p class="subtitle" style="text-align:left; font-size: 0.8rem;">
+                    * Increase weight by 2.5kg after finishing a block.<br>
+                    * Primary/Secondary Main Lifts calculated from 1RM Inputs.
+                </p>
+
+                <div class="table-wrapper">
+                    <table id="routine-table">
                         <thead>
-                            <tr id="table-head-row">
-                                <th>RPE / Reps</th>
-                                <!-- JS will populate reps 1-10 -->
+                            <tr>
+                                <th>Block/Week</th>
+                                <th>Primary Main Lift</th>
+                                <th>Secondary Main Lift</th>
+                                <th>Primary Muscle Up</th>
+                                <th>Secondary Muscle Up</th>
+                                <th>Assistance 1</th>
+                                <th>Assistance 2</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body">
-                            <!-- JS will populate rows -->
+                        <tbody id="routine-table-body">
+                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
 
-        <!-- Info Section -->
-        <section class="info-section">
-            <div class="info-grid">
-                <div class="card glass">
-                    <h3>How it Works</h3>
-                    <p>This calculator uses the <strong>RPE (Rate of Perceived Exertion)</strong> scale combined with
-                        your bodyweight for weighted calisthenics.</p>
-                    <p>In movements like Pull-ups and Dips, your body is part of the load. To find your true max, we
-                        calculate: <br><code>(Added Weight + Bodyweight) / Intensity% = Total Max</code></p>
-                </div>
-                <div class="card glass">
-                    <h3>Metrics Guide</h3>
-                    <ul>
-                        <li><strong>1RM:</strong> The maximum weight you can lift for a single repetition.</li>
-                        <li><strong>RPE 10:</strong> Maximum effort. No reps left in the tank.</li>
-                        <li><strong>RPE 9:</strong> 1 rep left in reserve.</li>
-                        <li><strong>RPE 8:</strong> 2 reps left in reserve.</li>
-                    </ul>
-                </div>
+
+        <!-- TAB 3: WORKOUT -->
+        <section id="tab-workout" class="tab-content">
+            <h2>Today's Workout</h2>
+            <p class="subtitle" id="workout-subtitle">Based on Block 1, Week 1</p>
+
+            <div id="workout-display">
+                <!-- Populated by JS -->
             </div>
         </section>
+
     </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 King Calc. Built for Streetlifters.</p>
-        </div>
-    </footer>
+    <!-- Bottom Navigation -->
+    <nav class="main-nav">
+        <a href="#" class="nav-item active" data-target="tab-calculator">
+            <span class="nav-icon">🔢</span>
+            <span>Calc</span>
+        </a>
+        <a href="#" class="nav-item" data-target="tab-routine">
+            <span class="nav-icon">📋</span>
+            <span>Routine</span>
+        </a>
+        <a href="#" class="nav-item" data-target="tab-workout">
+            <span class="nav-icon">💪</span>
+            <span>Workout</span>
+        </a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Notification</div>
 
     <script src="script.js"></script>
 </body>

@@ -7,14 +7,17 @@
     --secondary-color: #38bdf8;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
+    --danger-color: #ef4444;
     --glass-blur: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --nav-height: 60px;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -24,12 +27,14 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
     min-height: 100vh;
+    padding-bottom: calc(var(--nav-height) + 20px);
+    /* Space for bottom nav */
 }
 
 .container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 /* Background Blobs */
@@ -41,35 +46,36 @@ body {
     height: 100%;
     z-index: -1;
     overflow: hidden;
+    pointer-events: none;
 }
 
 .blob {
     position: absolute;
-    width: 40vw;
-    height: 40vw;
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
     border-radius: 50%;
-    filter: blur(60px);
+    filter: blur(80px);
 }
 
 .blob-1 {
-    top: -10%;
-    right: -10%;
+    top: -20%;
+    right: -20%;
 }
 
 .blob-2 {
-    bottom: -10%;
-    left: -10%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    bottom: -20%;
+    left: -20%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 /* Typography */
 h1 {
-    font-size: 3.5rem;
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: -1px;
-    margin-bottom: 0.5rem;
     text-align: center;
+    margin-top: 1rem;
 }
 
 .accent-text {
@@ -80,76 +86,189 @@ h1 {
 .subtitle {
     text-align: center;
     color: var(--text-secondary);
-    font-size: 1.1rem;
-    margin-bottom: 3rem;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Cards & Glassmorphism */
+h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Navigation */
+.main-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--nav-height);
+    background: rgba(11, 15, 25, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+}
+
+.nav-item {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: var(--transition);
+    padding: 0.5rem;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.nav-item.active {
+    color: var(--accent-color);
+    background: rgba(251, 191, 36, 0.05);
+}
+
+.nav-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Tabs Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 1RM Inputs Section */
+.rm-tracker {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.rm-input-group {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.rm-input-group label {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.rm-input-group input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--card-border);
+    border-radius: 0;
+    padding: 0.25rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    width: 100%;
+}
+
+.rm-input-group input:focus {
+    box-shadow: none;
+    border-color: var(--accent-color);
+}
+
+/* Sub Tabs (Exercises) */
+.sub-tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+}
+
+.sub-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.sub-tab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.sub-tab-btn.active {
+    background: var(--accent-color);
+    color: #000;
+    border-color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Calculator & Glass Cards */
 .glass {
     background: var(--card-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--card-border);
-    border-radius: 24px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-.card {
-    padding: 2rem;
-    margin-bottom: 2rem;
-    transition: var(--transition);
-}
-
-.card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-4px);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
     margin-bottom: 1.5rem;
 }
 
-.card-header h2 {
-    font-size: 1.5rem;
-    color: var(--text-primary);
-}
-
-.card-desc {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-/* Inputs */
-.grid-inputs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
 .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 label {
-    font-size: 0.85rem;
+    display: block;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-secondary);
+    margin-bottom: 0.5rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
 input,
 select {
+    width: 100%;
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 0.8rem 1rem;
+    padding: 0.8rem;
     color: white;
     font-family: inherit;
     font-size: 1rem;
@@ -160,261 +279,230 @@ input:focus,
 select:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
-}
-
-/* Toggle Switch */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #334155;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-}
-
-input:checked+.slider {
-    background-color: var(--accent-color);
-}
-
-input:checked+.slider:before {
-    transform: translateX(26px);
-}
-
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
-.toggle-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.toggle-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-/* Buttons */
-.actions {
-    display: flex;
-    gap: 1rem;
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.1);
 }
 
 .btn {
-    padding: 0.8rem 1.5rem;
+    width: 100%;
+    padding: 0.9rem;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: var(--transition);
-    font-family: inherit;
     font-size: 1rem;
+    transition: var(--transition);
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-primary {
     background: var(--accent-color);
     color: #000;
-    flex: 2;
 }
 
-.btn-primary:hover {
-    background: var(--accent-hover);
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+.btn-primary:active {
+    transform: scale(0.98);
 }
 
-.btn-secondary {
-    background: rgba(56, 189, 248, 0.1);
-    color: var(--secondary-color);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    flex: 1;
-}
-
-.btn-secondary:hover {
-    background: rgba(56, 189, 248, 0.2);
-}
-
-.btn-danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    flex: 1;
-}
-
-.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.2);
-}
-
-/* Result Card */
-.result-card {
+/* Result Display */
+.result-box {
     text-align: center;
-    border-top: 4px solid var(--accent-color);
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--card-border);
 }
 
-.result-display {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    padding: 1rem 0;
-}
-
-.result-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.result-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-}
-
-.result-value {
-    font-size: 3rem;
+.result-main {
+    font-size: 3.5rem;
     font-weight: 800;
-}
-
-.unit {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    font-weight: 400;
-}
-
-.highlight .result-value {
     color: var(--accent-color);
+    line-height: 1;
 }
 
-/* RPE Table */
-.overflow-x {
+.result-sub {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.highlight-added {
+    color: var(--secondary-color);
+    font-weight: 700;
+}
+
+/* Routine Table styling */
+.routine-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.table-wrapper {
     overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    margin-top: 1rem;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1rem;
-    min-width: 600px;
+    min-width: 800px;
+    /* Force scroll */
+    font-size: 0.85rem;
 }
 
 th,
 td {
-    padding: 1rem;
+    padding: 0.8rem;
     text-align: center;
     border-bottom: 1px solid var(--card-border);
+    border-right: 1px solid var(--card-border);
 }
 
 th {
-    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--accent-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+td {
+    color: var(--text-secondary);
+}
+
+td input {
+    background: transparent;
+    border: none;
+    text-align: center;
+    color: inherit;
+    font-size: inherit;
+    padding: 0;
+    width: 100%;
+}
+
+tr.active-week td {
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+tr.active-week td input {
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+/* Workout Day View */
+.workout-card {
+    border-left: 4px solid var(--accent-color);
+}
+
+.workout-exercise {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--card-border);
+}
+
+.workout-exercise:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.exercise-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.exercise-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.exercise-tag {
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.exercise-details {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.7rem;
     color: var(--text-secondary);
     text-transform: uppercase;
 }
 
-td {
-    font-family: 'Outfit';
-    font-weight: 500;
-}
-
-tr:hover td {
-    background: rgba(251, 191, 36, 0.05);
-}
-
-td:first-child,
-th:first-child {
-    text-align: left;
-    font-weight: 800;
-    color: var(--accent-color);
-    position: sticky;
-    left: 0;
-    background: var(--card-bg);
-}
-
-/* Info Section */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.info-section h3 {
-    margin-bottom: 1rem;
-    color: var(--secondary-color);
-}
-
-.info-section code {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
+.detail-value {
+    font-size: 1.2rem;
+    font-weight: 600;
     color: var(--accent-color);
 }
 
-.info-section ul {
-    list-style: none;
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: var(--bg-color);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
 }
 
-.info-section li {
-    margin-bottom: 0.5rem;
+.toast.show {
+    opacity: 1;
 }
 
-.info-section li strong {
-    color: var(--text-primary);
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 4rem 1rem;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    h1 {
-        font-size: 2.5rem;
+@media (min-width: 768px) {
+    .main-nav {
+        top: 0;
+        bottom: auto;
+        padding-left: 0;
+        justify-content: center;
+        gap: 2rem;
     }
 
-    .result-display {
-        gap: 1rem;
-        flex-direction: column;
+    body {
+        padding-bottom: 0;
+        padding-top: var(--nav-height);
     }
 
-    .card {
-        padding: 1.5rem;
+    .nav-item {
+        width: auto;
+        flex-direction: row;
+        gap: 0.5rem;
+        font-size: 1rem;
     }
 
-    .actions {
-        flex-direction: column;
+    .container {
+        padding: 2rem;
     }
 }

@@ -12,6 +12,8 @@
     --glass-blur: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --nav-height: 60px;
+    --input-bg: rgba(15, 23, 42, 0.6);
+    --placeholder-color: rgba(255, 255, 255, 0.4);
 }
 
 [data-theme="light"] {
@@ -25,6 +27,8 @@
     --text-primary: #000000;
     --text-secondary: #4a4a4a;
     --nav-bg: #e4f246;
+    --input-bg: rgba(0, 0, 0, 0.05);
+    --placeholder-color: rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -229,7 +233,7 @@ h3 {
     padding: 0.25rem 0;
     font-size: 1.25rem;
     font-weight: 700;
-    color: white;
+    color: var(--text-primary);
     width: 100%;
 }
 
@@ -331,25 +335,34 @@ h3 {
 
 label {
     display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 700;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    height: 1.2rem;
+    /* Fix alignment issues */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 input,
 select {
     width: 100%;
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--input-bg);
     border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 0.8rem;
-    color: white;
+    color: var(--text-primary);
     font-family: inherit;
     font-size: 1rem;
     transition: var(--transition);
+}
+
+::placeholder {
+    color: var(--placeholder-color);
 }
 
 input:focus,

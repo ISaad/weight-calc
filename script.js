@@ -330,7 +330,54 @@ function saveRoutine() {
     updateWorkoutDisplay();
 }
 
+// Helper to calculate weight
+// Returns string "Total: X kg / Added: Y kg"
+function getWeightRecommendation(exName, setString, rirString, isSecondary = false) {
+    const oneRM = parseFloat(rmInputs[exName].value) || 0;
+    const bodyweightInput = document.getElementById('calc-bw');
+    const bw = parseFloat(bodyweightInput.value) || 0;
+
+    if (oneRM === 0) return "Set 1RM first";
+
+    // Parse Reps from "1x5" or "10"
+    const match = setString.match(/(\d+)x(\d+)/);
+    if (!match) return "Manual Calc";
+
+    const reps = parseInt(match[2]);
+
+    // Parse RIR "3-4"
+    const rirMatch = rirString.match(/(\d+(\.\d+)?)/);
+    const rirVal = rirMatch ? parseFloat(rirMatch[0]) : 3;
+
+    // Map RIR to RPE
+    let rpeEst = 10 - rirVal;
+    rpeEst = Math.round(rpeEst * 2) / 2;
+    if (rpeEst < 6) rpeEst = 6;
+    if (rpeEst > 10) rpeEst = 10;
+
+    const rpeKey = rpeEst.toString();
+    const arr = rpeToPercent[rpeKey] || rpeToPercent["7"];
+
+    if (reps > 10) return "Hypertrophy (Light)";
+
+    let intensity = arr[reps - 1];
+    let totalLoad = oneRM * (intensity / 100);
+
+    if (isSecondary) {
+        totalLoad = totalLoad * 0.90;
+    }
+
+    const addedLoad = totalLoad - bw;
+
+    if (exName === 'squat') {
+        return `${totalLoad.toFixed(1)} kg`;
+    } else {
+        return `+${addedLoad.toFixed(1)} kg <span style="font-size:0.8em; opacity:0.7">(Tot: ${totalLoad.toFixed(1)})</span>`;
+    }
+}
+
 function updateWorkoutDisplay() {
+    console.log("Updating Workout Display...");
     const block = parseInt(routineBlockSelect.value);
     const week = parseInt(routineWeekSelect.value);
 
@@ -338,66 +385,8 @@ function updateWorkoutDisplay() {
     workoutDisplay.innerHTML = '';
 
     const weekData = routineData[block - 1][week - 1];
-    const bw = parseFloat(calcBwInput.value) || 0;
-
-    // Helper to calculate weight
-    // Returns string "Total: X kg / Added: Y kg"
-    const getWeightRecommendation = (exName, setString, rirString, isSecondary = false) => {
-        const oneRM = parseFloat(rmInputs[exName].value) || 0;
-        if (oneRM === 0) return "Set 1RM first";
-
-        // Parse Reps from "1x5" or "10"
-        // If complex string "1x5 + 2x8", pick first?
-        // Let's try to parse the first "NxM"
-        const match = setString.match(/(\d+)x(\d+)/);
-        if (!match) return "Manual Calc";
-
-        const reps = parseInt(match[2]);
-
-        // Parse RIR "3-4" -> take average or min? RIR 3 = harder than 4.
-        // Let's take the first number.
-        const rirMatch = rirString.match(/(\d+(\.\d+)?)/);
-        const rirVal = rirMatch ? parseFloat(rirMatch[0]) : 3;
-
-        // Map RIR to RPE
-        // RIR 0=10, 1=9, 2=8, 3=7, 4=6
-        let rpeEst = 10 - rirVal;
-
-        // Round to nearest 0.5
-        rpeEst = Math.round(rpeEst * 2) / 2;
-        if (rpeEst < 6) rpeEst = 6;
-        if (rpeEst > 10) rpeEst = 10;
-
-        const rpeKey = rpeEst.toString();
-        const arr = rpeToPercent[rpeKey] || rpeToPercent["7"]; // Fallback RPE7
-
-        // Safety for reps > 10
-        if (reps > 10) return "Hypertrophy (Light)";
-
-        let intensity = arr[reps - 1];
-
-        // Calculate
-        let totalLoad = oneRM * (intensity / 100);
-
-        if (isSecondary) {
-            totalLoad = totalLoad * 0.90; // 10% reduction
-        }
-
-        const addedLoad = totalLoad - bw;
-
-        // Format
-        if (exName === 'squat') {
-            return `${totalLoad.toFixed(1)} kg`;
-        } else {
-            return `+${addedLoad.toFixed(1)} kg <span style="font-size:0.8em; opacity:0.7">(Tot: ${totalLoad.toFixed(1)})</span>`;
-        }
-    };
 
     // Define the exercises for the day
-    // We will generate cards for all 4, assuming they follow the pattern
-    // Muscle Up uses MU columns
-    // Others use Main/Secondary Main columns
-
     // Exercise 1: Muscle Up
     createExerciseCard("Muscle-Up", "muscleup", weekData[4], weekData[5], false); // Primary MU
     // Exercise 2: Dip (Main)
@@ -409,17 +398,13 @@ function updateWorkoutDisplay() {
     // Exercise 4: Pull-Up (Main)
     createExerciseCard("Pull-Up", "pullup", weekData[0], weekData[1], false);
 
-    // Note: Secondary Main logic
-    // The prompt says "Secondary lifts are the same... but paused... reduced by 10%".
-    // I will add a generic "Secondary Main" card that user can apply to Dip/Pullup if they are doing a secondary day.
-
+    // Secondary lifts
     const div = document.createElement('div');
     div.innerHTML = "<h3 style='margin-top:2rem'>Secondary Day Reference</h3>";
     workoutDisplay.appendChild(div);
 
     createExerciseCard("Dip (Secondary)", "dip", weekData[2], weekData[3], true);
     createExerciseCard("Pull-Up (Secondary)", "pullup", weekData[2], weekData[3], true);
-
 }
 
 function createExerciseCard(title, exKey, sets, rir, isSec) {

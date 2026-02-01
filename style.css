@@ -3,6 +3,7 @@
     --card-bg: rgba(23, 23, 23, 0.7);
     --card-border: rgba(228, 242, 70, 0.2);
     --accent-color: #e4f246;
+    --accent-text: #000000;
     --accent-hover: #d2df3b;
     --secondary-color: #cdc1b9;
     --text-primary: #f8fafc;
@@ -18,6 +19,7 @@
     --card-bg: rgba(255, 255, 255, 0.8);
     --card-border: rgba(0, 0, 0, 0.1);
     --accent-color: #000000;
+    --accent-text: #ffffff;
     --accent-hover: #333333;
     --secondary-color: #666666;
     --text-primary: #000000;
@@ -111,7 +113,7 @@ body {
 
 .theme-btn:hover {
     background: var(--accent-color);
-    color: #000;
+    color: var(--accent-text);
 }
 
 .subtitle {
@@ -264,7 +266,7 @@ h3 {
 
 .sub-tab-btn.active {
     background: var(--accent-color);
-    color: #000;
+    color: var(--accent-text);
     border-color: var(--accent-color);
     font-weight: 600;
 }
@@ -375,7 +377,7 @@ select:focus {
 
 .btn-primary {
     background: var(--accent-color);
-    color: #000;
+    color: var(--accent-text);
 }
 
 .btn-secondary {

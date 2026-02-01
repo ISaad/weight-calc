@@ -10,6 +10,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
+    <meta name="theme-color" content="#e4f246">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StreetLift Pro">
+    <link rel="apple-touch-icon" href="icon.png">
 </head>
 
 <body>
@@ -20,8 +27,14 @@
 
     <!-- Header -->
     <header class="container">
-        <h1>STREETLIFT <span class="accent-text">PRO</span></h1>
-        <p class="subtitle">Complete Performance Tracking</p>
+        <div class="header-top">
+            <h1>STREETLIFT <span class="accent-text">PRO</span></h1>
+            <div class="header-controls">
+                <button id="pwa-install" class="theme-btn" style="display: none;" title="Install App">📥</button>
+                <button id="theme-toggle" class="theme-btn">🌙</button>
+            </div>
+        </div>
+        <p class="subtitle">Built for Streetlifters</p>
     </header>
 
     <main class="container">
@@ -31,6 +44,7 @@
 
             <!-- 1RM Inputs -->
             <h2>Your 1RM Stats</h2>
+            <p class="section-desc">Input your added weight (e.g., 20) or assistance (e.g., -14).</p>
             <div class="rm-tracker glass">
                 <div class="rm-input-group">
                     <label for="rm-muscleup">Muscle-Up (kg)</label>
@@ -50,6 +64,14 @@
                 </div>
             </div>
 
+            <!-- Central Bodyweight Section -->
+            <div class="bw-section glass">
+                <div class="input-group">
+                    <label for="calc-bw">Your Bodyweight (kg)</label>
+                    <input type="number" id="calc-bw" placeholder="e.g. 62">
+                </div>
+            </div>
+
             <!-- Sub Tabs for Exercises -->
             <div class="sub-tabs">
                 <button class="sub-tab-btn active" data-ex="muscleup">Muscle-Up</button>
@@ -62,16 +84,6 @@
             <div class="glass">
                 <div class="exercise-header">
                     <h3 id="calc-title">Muscle-Up Calculator</h3>
-                    <div class="toggle-container" id="weighted-toggle-container">
-                        <label>
-                            <input type="checkbox" id="calc-weighted" checked> Weighted
-                        </label>
-                    </div>
-                </div>
-
-                <div class="input-group" id="calc-bw-group">
-                    <label>Bodyweight (kg)</label>
-                    <input type="number" id="calc-bw" placeholder="e.g. 75">
                 </div>
 
                 <div class="routine-controls">
@@ -100,9 +112,43 @@
                 <!-- Result -->
                 <div class="result-box">
                     <div class="result-sub">You should lift:</div>
-                    <div class="result-main" id="result-weight">--</span> <span class="unit">kg</div>
-                    <div class="result-sub" id="result-breakdown">Total: -- | Added: --</div>
+                    <div class="result-main" id="result-weight">--</div>
+                    <div class="result-sub" id="result-breakdown">Total Load: --</div>
                 </div>
+            </div>
+
+            <!-- Estimate 1RM Section -->
+            <div class="glass" id="estimate-section">
+                <h3>Don't know your 1RM yet? Calculate it here!</h3>
+                <div class="routine-controls">
+                    <div class="input-group">
+                        <label>Weight Lifted (Added/Assisted)</label>
+                        <input type="number" id="est-weight" placeholder="+10 or -14">
+                    </div>
+                    <div class="input-group">
+                        <label>Reps Done</label>
+                        <input type="number" id="est-reps" placeholder="5">
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="btn-estimate">Estimate 1RM</button>
+                <div id="est-result" class="result-sub" style="margin-top: 1rem; font-weight: bold; display: none;">
+                    Estimated 1RM (Added): <span id="est-val" class="accent-text">--</span> kg
+                </div>
+            </div>
+
+            <!-- How to Use Section -->
+            <div class="glass how-to-use">
+                <h3>How to Use</h3>
+                <ul>
+                    <li><strong>1. Enter 1RM Stats:</strong> Put the weight you added to your bodyweight for your best
+                        single rep. Use negative values (e.g., -10) if you used assistance.</li>
+                    <li><strong>2. Set Bodyweight:</strong> This is used to calculate percentages correctly.</li>
+                    <li><strong>3. Use Calculator:</strong> Select an exercise and input the target reps/RIR to see what
+                        weight to use.</li>
+                    <li><strong>4. Check Routine:</strong> View your weekly plan in the Routine tab.</li>
+                    <li><strong>5. Workout Mode:</strong> Use the Workout tab during your session for specific targets.
+                    </li>
+                </ul>
             </div>
         </section>
 
@@ -142,7 +188,7 @@
                     <table id="routine-table">
                         <thead>
                             <tr>
-                                <th>Block/Week</th>
+                                <th>Week</th>
                                 <th>Primary Main Lift</th>
                                 <th>Secondary Main Lift</th>
                                 <th>Primary Muscle Up</th>
@@ -162,7 +208,7 @@
 
         <!-- TAB 3: WORKOUT -->
         <section id="tab-workout" class="tab-content">
-            <h2>Today's Workout</h2>
+            <h2>This Week's Workout</h2>
             <p class="subtitle" id="workout-subtitle">Based on Block 1, Week 1</p>
 
             <div id="workout-display">
@@ -176,14 +222,14 @@
     <nav class="main-nav">
         <a href="#" class="nav-item active" data-target="tab-calculator">
             <span class="nav-icon">🔢</span>
-            <span>Calc</span>
+            <span>Calculator</span>
         </a>
         <a href="#" class="nav-item" data-target="tab-routine">
             <span class="nav-icon">📋</span>
             <span>Routine</span>
         </a>
         <a href="#" class="nav-item" data-target="tab-workout">
-            <span class="nav-icon">💪</span>
+            <span class="nav-icon" id="workout-emoji">💪🏾</span>
             <span>Workout</span>
         </a>
     </nav>

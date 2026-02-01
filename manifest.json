@@ -1,0 +1,17 @@
+{
+  "name": "StreetLift Pro",
+  "short_name": "StreetLift",
+  "description": "Premium Streetlifting Performance Tracking",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#e4f246",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

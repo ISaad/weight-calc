@@ -13,15 +13,24 @@ const rmInputs = {
     pullup: document.getElementById('rm-pullup')
 };
 const calcTitle = document.getElementById('calc-title');
-const calcWeightedToggle = document.getElementById('calc-weighted');
-const weightedContainer = document.getElementById('weighted-toggle-container');
-const calcBwGroup = document.getElementById('calc-bw-group');
 const calcBwInput = document.getElementById('calc-bw');
 const calcRepsInput = document.getElementById('calc-reps');
 const calcRirSelect = document.getElementById('calc-rir');
 const btnCalculate = document.getElementById('btn-calculate');
 const resultWeight = document.getElementById('result-weight');
 const resultBreakdown = document.getElementById('result-breakdown');
+
+// Estimate Elements
+const estWeightInput = document.getElementById('est-weight');
+const estRepsInput = document.getElementById('est-reps');
+const btnEstimate = document.getElementById('btn-estimate');
+const estResultDiv = document.getElementById('est-result');
+const estValSpan = document.getElementById('est-val');
+
+// Theme Toggle
+const themeToggle = document.getElementById('theme-toggle');
+const workoutEmoji = document.getElementById('workout-emoji');
+const pwaInstallBtn = document.getElementById('pwa-install');
 
 // Routine Elements
 const routineBlockSelect = document.getElementById('routine-block');
@@ -105,10 +114,68 @@ const defaultRoutine = [
 
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
+    initTheme();
+    initPWA();
     updateCalculatorUI();
     renderRoutineTable();
     updateWorkoutDisplay();
 });
+
+// PWA Logic
+let deferredPrompt;
+
+function initPWA() {
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Error', err));
+    }
+
+    // Handle Install Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        pwaInstallBtn.style.display = 'flex';
+    });
+
+    pwaInstallBtn.addEventListener('click', () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    pwaInstallBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+    });
+}
+
+// Theme Logic
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+}
+
+themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeUI(next);
+});
+
+function updateThemeUI(theme) {
+    if (theme === 'light') {
+        themeToggle.textContent = '☀️';
+        workoutEmoji.textContent = '💪🏾';
+    } else {
+        themeToggle.textContent = '🌙';
+        workoutEmoji.textContent = '💪🏻';
+    }
+}
 
 // Tab Navigation
 navItems.forEach(item => {
@@ -146,13 +213,30 @@ Object.keys(rmInputs).forEach(key => {
 
 // Calculator Inputs
 btnCalculate.addEventListener('click', calculateSingle);
-calcWeightedToggle.addEventListener('change', () => {
-    if (currentExercise !== 'squat') {
-        calcBwGroup.style.display = calcWeightedToggle.checked ? 'block' : 'none';
-        localStorage.setItem(`weighted_${currentExercise}`, calcWeightedToggle.checked);
-    }
+calcBwInput.addEventListener('input', () => {
+    localStorage.setItem('bodyweight', calcBwInput.value);
+    updateWorkoutDisplay();
 });
-calcBwInput.addEventListener('input', () => localStorage.setItem('bodyweight', calcBwInput.value));
+
+// Estimate Logic
+btnEstimate.addEventListener('click', () => {
+    const w = parseFloat(estWeightInput.value) || 0;
+    const r = parseInt(estRepsInput.value) || 0;
+    const bw = parseFloat(calcBwInput.value) || 0;
+
+    if (r === 0) {
+        showToast('Please enter reps');
+        return;
+    }
+
+    // 1RM estimate using Brzycki Formula on TOTAL weight
+    const totalWeight = bw + w;
+    const estimatedTotal = totalWeight * (36 / (37 - r));
+    const estimatedAdded = estimatedTotal - bw;
+
+    estValSpan.textContent = estimatedAdded.toFixed(1);
+    estResultDiv.style.display = 'block';
+});
 
 // Routine Selectors
 routineBlockSelect.addEventListener('change', () => {
@@ -187,7 +271,6 @@ function loadData() {
 }
 
 function updateCalculatorUI() {
-    // Title
     const names = {
         muscleup: 'Muscle-Up',
         dip: 'Dip',
@@ -195,67 +278,35 @@ function updateCalculatorUI() {
         pullup: 'Pull-Up'
     };
     calcTitle.textContent = `${names[currentExercise]} Calculator`;
-
-    // Squat logic
-    if (currentExercise === 'squat') {
-        calcWeightedToggle.checked = false;
-        weightedContainer.style.display = 'none';
-        calcBwGroup.style.display = 'none';
-    } else {
-        weightedContainer.style.display = 'flex';
-        // Check saved preference or default to true
-        calcWeightedToggle.checked = true; // Default
-        calcBwGroup.style.display = 'block';
-    }
 }
 
 function calculateSingle() {
-    // Get Stats
-    const oneRM = parseFloat(rmInputs[currentExercise].value) || 0;
+    const addedRM = parseFloat(rmInputs[currentExercise].value) || 0;
     const bodyweight = parseFloat(calcBwInput.value) || 0;
     const reps = parseInt(calcRepsInput.value) || 0;
-    const rir = calcRirSelect.value; // string key
+    const rir = calcRirSelect.value;
 
-    if (oneRM === 0 || reps === 0) {
-        showToast('Please set your 1RM and Reps');
+    if (reps === 0) {
+        showToast('Please enter reps');
         return;
     }
 
-    // Determine Intensity
-    // Handle RIR ranges or decimals mapping
-    // We map strict values from select to keys.
     const rpeKey = rirToRpeKey[rir];
-    if (!rpeKey) return;
-
-    // Get intensity array
     const intensities = rpeToPercent[rpeKey];
     if (!intensities || reps > 10) {
-        showToast('Reps too high for this RIR estimate');
+        showToast('Reps too high for estimate');
         return;
     }
 
-    const percentage = intensities[reps - 1]; // 0-indexed
+    const percentage = intensities[reps - 1];
 
-    // Calculate Total Weight needed
-    // 1RM = TotalWeight / (Percentage/100)
-    // So TotalWeight = 1RM * (Percentage/100)
-    const totalWeight = oneRM * (percentage / 100);
+    // Total 1RM = Bodyweight + AddedRM
+    const oneRMTotal = bodyweight + addedRM;
+    const targetTotal = oneRMTotal * (percentage / 100);
+    const targetAdded = targetTotal - bodyweight;
 
-    // Display
-    const isWeighted = (currentExercise !== 'squat' && calcWeightedToggle.checked);
-
-    if (isWeighted) {
-        const addedWeight = totalWeight - bodyweight;
-        resultWeight.textContent = addedWeight.toFixed(1);
-        resultBreakdown.innerHTML = `Total: ${totalWeight.toFixed(1)}kg <br> Added Weight`;
-
-        if (addedWeight < 0) {
-            resultBreakdown.innerHTML += ` <br>(Assisted: ${(addedWeight * -1).toFixed(1)}kg)`;
-        }
-    } else {
-        resultWeight.textContent = totalWeight.toFixed(1);
-        resultBreakdown.textContent = `Total Load`;
-    }
+    resultWeight.textContent = targetAdded.toFixed(2);
+    resultBreakdown.innerHTML = `Total Load: ${targetTotal.toFixed(2)}kg`;
 }
 
 function renderRoutineTable() {
@@ -271,7 +322,19 @@ function renderRoutineTable() {
 
         // Week Label
         const tdWeek = document.createElement('td');
-        tdWeek.textContent = `Week ${weekIndex + 1}`;
+        const weekDiv = document.createElement('div');
+        weekDiv.textContent = `Week ${weekIndex + 1}`;
+
+        const rirDiv = document.createElement('div');
+        rirDiv.textContent = 'RIR';
+        rirDiv.style.fontSize = '0.7rem';
+        rirDiv.style.marginTop = '4px';
+        rirDiv.style.fontWeight = 'bold';
+        // Use color of first RIR cell in row (primary main lift)
+        rirDiv.style.color = 'var(--accent-color)';
+
+        tdWeek.appendChild(weekDiv);
+        tdWeek.appendChild(rirDiv);
         tr.appendChild(tdWeek);
 
         // Columns: Main, Sec Main, MU, Sec MU, A1, A2
@@ -331,49 +394,79 @@ function saveRoutine() {
 }
 
 // Helper to calculate weight
-// Returns string "Total: X kg / Added: Y kg"
-function getWeightRecommendation(exName, setString, rirString, isSecondary = false) {
-    const oneRM = parseFloat(rmInputs[exName].value) || 0;
+// Returns an array of objects for multi-part sets: [{protocol: "1x2", weight: "18.3"}, {protocol: "2x5", weight: "11.1"}]
+function getWeightDetails(exName, setString, rirString, isSecondary = false) {
     const bodyweightInput = document.getElementById('calc-bw');
     const bw = parseFloat(bodyweightInput.value) || 0;
+    const addedRM = parseFloat(rmInputs[exName].value) || 0;
+    const oneRMTotal = bw + addedRM;
 
-    if (oneRM === 0) return "Set 1RM first";
+    if (oneRMTotal === 0) return [{ protocol: setString, weight: "1RM?", rir: rirString }];
 
-    // Parse Reps from "1x5" or "10"
-    const match = setString.match(/(\d+)x(\d+)/);
-    if (!match) return "Manual Calc";
+    // Split "1x2 + 2x5" into parts
+    const parts = setString.split('+').map(p => p.trim());
+    const results = [];
 
-    const reps = parseInt(match[2]);
+    parts.forEach(part => {
+        // More robust rep parsing
+        // Case: "1x5" -> 5
+        // Case: "5" -> 5
+        // Case: "2x10-15" -> 15 (assume higher for percentage)
+        // Case: "EMOM3 2r" -> 2
 
-    // Parse RIR "3-4"
-    const rirMatch = rirString.match(/(\d+(\.\d+)?)/);
-    const rirVal = rirMatch ? parseFloat(rirMatch[0]) : 3;
+        let reps = 0;
+        const repsMatch = part.match(/(\d+)$/) || part.match(/x(\d+)/);
+        if (repsMatch) {
+            reps = parseInt(repsMatch[1]);
+        } else {
+            const rangeMatch = part.match(/-(\d+)/);
+            if (rangeMatch) reps = parseInt(rangeMatch[1]);
+        }
 
-    // Map RIR to RPE
-    let rpeEst = 10 - rirVal;
-    rpeEst = Math.round(rpeEst * 2) / 2;
-    if (rpeEst < 6) rpeEst = 6;
-    if (rpeEst > 10) rpeEst = 10;
+        if (reps === 0 || isNaN(reps)) {
+            // Check for Cluster
+            if (part.toLowerCase().includes('cluster')) {
+                const clusterMatch = part.match(/(\d+)\+(\d+)/);
+                if (clusterMatch) reps = parseInt(clusterMatch[1]) + parseInt(clusterMatch[2]);
+            }
+        }
 
-    const rpeKey = rpeEst.toString();
-    const arr = rpeToPercent[rpeKey] || rpeToPercent["7"];
+        if (reps === 0 || isNaN(reps)) {
+            results.push({ protocol: part, weight: "Manual", rir: rirString });
+            return;
+        }
 
-    if (reps > 10) return "Hypertrophy (Light)";
+        // Parse RIR "3-4" -> use average or lower end
+        const rirMatch = rirString.match(/(\d+(\.\d+)?)/);
+        const rirVal = rirMatch ? parseFloat(rirMatch[0]) : 3;
 
-    let intensity = arr[reps - 1];
-    let totalLoad = oneRM * (intensity / 100);
+        // Map RIR to RPE
+        let rpeEst = 10 - rirVal;
+        rpeEst = Math.round(rpeEst * 2) / 2;
+        if (rpeEst < 6) rpeEst = 6;
+        if (rpeEst > 10) rpeEst = 10;
 
-    if (isSecondary) {
-        totalLoad = totalLoad * 0.90;
-    }
+        const rpeKey = rpeEst.toString();
+        const arr = rpeToPercent[rpeKey] || rpeToPercent["7"];
 
-    const addedLoad = totalLoad - bw;
+        let weightText = "";
+        if (reps > 10) {
+            weightText = "Light";
+        } else {
+            let intensity = arr[reps - 1];
+            let totalLoad = oneRMTotal * (intensity / 100);
+            if (isSecondary) totalLoad *= 0.90;
 
-    if (exName === 'squat') {
-        return `${totalLoad.toFixed(1)} kg`;
-    } else {
-        return `+${addedLoad.toFixed(1)} kg <span style="font-size:0.8em; opacity:0.7">(Tot: ${totalLoad.toFixed(1)})</span>`;
-    }
+            const addedLoad = totalLoad - bw;
+            // No rounding as requested: "Keep them exactly as in the Calculator tab"
+            // Actually, keep 1 or 2 decimals for readability but don't "round up" to nearest 2.5
+            weightText = addedLoad.toFixed(2);
+        }
+
+        results.push({ protocol: part, weight: weightText, rir: rirString });
+    });
+
+    return results;
 }
 
 function updateWorkoutDisplay() {
@@ -413,27 +506,53 @@ function createExerciseCard(title, exKey, sets, rir, isSec) {
     const el = document.createElement('div');
     el.className = 'workout-exercise';
 
-    const weight = getWeightRecommendation(exKey, sets, rir, isSec);
+    const details = getWeightDetails(exKey, sets, rir, isSec);
+
+    // Intensity Label logic
+    let intensityLabel = "Heavy";
+    const rirMatch = rir.match(/(\d+)/);
+    const rirVal = rirMatch ? parseInt(rirMatch[0]) : 3;
+
+    if (rirVal <= 1) intensityLabel = "Very Heavy";
+    else if (rirVal <= 2) intensityLabel = "Heavy";
+    else if (rirVal <= 3) intensityLabel = "Moderate";
+    else intensityLabel = "Light";
+
+    let detailsHtml = "";
+    details.forEach(d => {
+        // Handle positive/negative weight signs
+        let weightDisplay = d.weight;
+        if (!isNaN(parseFloat(weightDisplay))) {
+            const w = parseFloat(weightDisplay);
+            weightDisplay = w > 0 ? `${w.toFixed(2)}` : `${w.toFixed(2)}`;
+            // If exactly 0, just "0"
+            if (Math.abs(w) < 0.01) weightDisplay = "BW (0)";
+        }
+
+        detailsHtml += `
+            <div class="exercise-details">
+                <div class="detail-item">
+                    <span class="detail-label">Protocol</span>
+                    <span class="detail-value" style="font-size:1rem">${d.protocol}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Intensity</span>
+                    <span class="detail-value" style="font-size:1rem">RIR ${d.rir}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Target Weight</span>
+                    <span class="detail-value">${weightDisplay} <span style="font-size:0.6rem">kg</span></span>
+                </div>
+            </div>
+        `;
+    });
 
     el.innerHTML = `
         <div class="exercise-header">
             <span class="exercise-name">${title}</span>
-            <span class="exercise-tag">${isSec ? 'Paused / Light' : 'Heavy'}</span>
+            <span class="exercise-tag">${isSec ? 'Secondary / Ref' : intensityLabel}</span>
         </div>
-        <div class="exercise-details">
-            <div class="detail-item">
-                <span class="detail-label">Protocol</span>
-                <span class="detail-value" style="font-size:1rem">${sets}</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Intensity</span>
-                <span class="detail-value" style="font-size:1rem">RIR ${rir}</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Target Weight</span>
-                <span class="detail-value">${weight}</span>
-            </div>
-        </div>
+        ${detailsHtml}
     `;
     workoutDisplay.appendChild(el);
 }

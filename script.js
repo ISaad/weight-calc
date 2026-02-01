@@ -486,38 +486,50 @@ function updateWorkoutDisplay() {
 
     const weekData = routineData[block - 1][week - 1];
 
-    // Define the exercises for the day
-    // Exercise 1: Muscle Up
-    createExerciseCard("Muscle-Up", "muscleup", weekData[4], weekData[5], false); // Primary MU
-    // Exercise 2: Dip (Main)
+    // --- PRIMARY LIFTS SECTION ---
+    const primaryTitle = document.createElement('div');
+    primaryTitle.className = 'workout-section-title';
+    primaryTitle.textContent = "Primary Lifts";
+    workoutDisplay.appendChild(primaryTitle);
+
+    // Primary Muscle Up
+    createExerciseCard("Muscle-Up", "muscleup", weekData[4], weekData[5], false);
+    // Primary Main Lifts
     createExerciseCard("Dip", "dip", weekData[0], weekData[1], false);
-
-    // Exercise 3: Squat (Main)
     createExerciseCard("Squat", "squat", weekData[0], weekData[1], false);
-
-    // Exercise 4: Pull-Up (Main)
     createExerciseCard("Pull-Up", "pullup", weekData[0], weekData[1], false);
 
-    // Secondary lifts
-    const div = document.createElement('div');
-    div.innerHTML = "<h3 style='margin-top:2rem'>Secondary Day Reference</h3>";
-    workoutDisplay.appendChild(div);
+    // --- SECONDARY LIFTS SECTION ---
+    const secondaryTitle = document.createElement('div');
+    secondaryTitle.className = 'workout-section-title';
+    secondaryTitle.textContent = "Secondary Lifts";
+    workoutDisplay.appendChild(secondaryTitle);
 
-    createExerciseCard("Dip (Secondary)", "dip", weekData[2], weekData[3], true);
-    createExerciseCard("Pull-Up (Secondary)", "pullup", weekData[2], weekData[3], true);
+    const secondaryNote = document.createElement('p');
+    secondaryNote.className = 'section-desc';
+    secondaryNote.style.textAlign = 'left';
+    secondaryNote.style.marginBottom = '1.5rem';
+    secondaryNote.innerHTML = "* Secondary lifts are calculated with a <strong>10% decrease</strong> in intensity to focus on technique and recovery.";
+    workoutDisplay.appendChild(secondaryNote);
+
+    // Secondary Muscle Up (EMOM or Cluster)
+    createExerciseCard("EMOM Muscle-Ups", "muscleup", weekData[6], weekData[7], true);
+    // Secondary Main Lifts (Paused Variations)
+    createExerciseCard("Paused Dips", "dip", weekData[2], weekData[3], true);
+    createExerciseCard("Paused Squats", "squat", weekData[2], weekData[3], true);
+    createExerciseCard("Paused Pull-Ups", "pullup", weekData[2], weekData[3], true);
 }
 
 function createExerciseCard(title, exKey, sets, rir, isSec) {
-    if (!sets || sets === "-" || sets === "") return;
+    if (!sets || sets === "-" || sets === "" || sets === " ") return;
 
     const el = document.createElement('div');
     el.className = 'workout-exercise';
 
-    const details = getWeightDetails(exKey, sets, rir, isSec);
-
-    // Intensity Label logic
+    // RIR processing for intensity label
+    let rirText = rir || "0";
     let intensityLabel = "Heavy";
-    const rirMatch = rir.match(/(\d+)/);
+    const rirMatch = rirText.match(/(\d+)/);
     const rirVal = rirMatch ? parseInt(rirMatch[0]) : 3;
 
     if (rirVal <= 1) intensityLabel = "Very Heavy";
@@ -525,15 +537,16 @@ function createExerciseCard(title, exKey, sets, rir, isSec) {
     else if (rirVal <= 3) intensityLabel = "Moderate";
     else intensityLabel = "Light";
 
+    const details = getWeightDetails(exKey, sets, rirText, isSec);
+
     let detailsHtml = "";
     details.forEach(d => {
-        // Handle positive/negative weight signs
         let weightDisplay = d.weight;
         if (!isNaN(parseFloat(weightDisplay))) {
             const w = parseFloat(weightDisplay);
-            weightDisplay = w > 0 ? `${w.toFixed(2)}` : `${w.toFixed(2)}`;
             // If exactly 0, just "0"
             if (Math.abs(w) < 0.01) weightDisplay = "BW (0)";
+            else weightDisplay = w.toFixed(2); // Match calculator formatting
         }
 
         detailsHtml += `
@@ -543,8 +556,8 @@ function createExerciseCard(title, exKey, sets, rir, isSec) {
                     <span class="detail-value" style="font-size:1rem">${d.protocol}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Intensity</span>
-                    <span class="detail-value" style="font-size:1rem">RIR ${d.rir}</span>
+                    <span class="detail-label">Target RIR</span>
+                    <span class="detail-value" style="font-size:1rem">${rirText}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Target Weight</span>
@@ -557,7 +570,7 @@ function createExerciseCard(title, exKey, sets, rir, isSec) {
     el.innerHTML = `
         <div class="exercise-header">
             <span class="exercise-name">${title}</span>
-            <span class="exercise-tag">${isSec ? 'Secondary / Ref' : intensityLabel}</span>
+            <span class="exercise-tag">${intensityLabel}</span>
         </div>
         ${detailsHtml}
     `;

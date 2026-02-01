@@ -25,16 +25,33 @@
         <div class="blob blob-2"></div>
     </div>
 
-    <!-- Header -->
     <header class="container">
         <div class="header-top">
-            <h1>STREETLIFT <span class="accent-text">PRO</span></h1>
-            <div class="header-controls">
-                <button id="pwa-install" class="theme-btn" style="display: none;" title="Install App">📥</button>
-                <button id="theme-toggle" class="theme-btn">🌙</button>
+            <div class="header-main">
+                <h1>STREETLIFT <span class="accent-text">PRO</span></h1>
+                <div class="header-controls">
+                    <button id="pwa-install" class="theme-btn" style="display: none;" title="Install App">📥</button>
+                    <button id="theme-toggle" class="theme-btn">🌙</button>
+                </div>
             </div>
+            <p class="subtitle">Built for Streetlifters</p>
+
+            <!-- Moved Navigation from bottom to top -->
+            <nav class="main-nav-top">
+                <a href="#" class="nav-item active" data-target="tab-calculator">
+                    <span class="nav-icon">🔢</span>
+                    <span>Calculator</span>
+                </a>
+                <a href="#" class="nav-item" data-target="tab-routine">
+                    <span class="nav-icon">📋</span>
+                    <span>Routine</span>
+                </a>
+                <a href="#" class="nav-item" data-target="tab-workout">
+                    <span class="nav-icon" id="workout-emoji">💪🏾</span>
+                    <span>Workout</span>
+                </a>
+            </nav>
         </div>
-        <p class="subtitle">Built for Streetlifters</p>
     </header>
 
     <main class="container">
@@ -44,7 +61,7 @@
 
             <!-- 1RM Inputs -->
             <h2>Your 1RM Stats</h2>
-            <p class="section-desc">Input your added weight (e.g., 20) or assistance (e.g., -14).</p>
+            <p class="section-desc">* Increase weight by 2.5kg after successfully finishing a block.</p>
             <div class="rm-tracker glass">
                 <div class="rm-input-group">
                     <label for="rm-muscleup">Muscle-Up (kg)</label>
@@ -140,13 +157,19 @@
             <div class="glass how-to-use">
                 <h3>How to Use</h3>
                 <ul>
-                    <li><strong>1. Enter 1RM Stats:</strong> Put the weight you added or assisted (-).</li>
-                    <li><strong>2. Set Bodyweight:</strong> Enter your current weight in the box above.</li>
-                    <li><strong>3. Use Calculator:</strong> Check what weight to use for specific Reps/RIR.</li>
-                    <li><strong>4. Install App:</strong>
-                        <br>• <strong>Android:</strong> Tap the 📥 button at the top.
-                        <br>• <strong>iPhone:</strong> Tap the <span style="font-size: 1.1rem;">⎋</span> (Share) icon
-                        and select <strong>"Add to Home Screen"</strong>.
+                    <li><strong>1. Enter 1RM Stats:</strong> In the boxes above, put the weight you added to your
+                        bodyweight (e.g. 20) or assisted weight (using a minus sign, e.g. -14).</li>
+                    <li><strong>2. Bodyweight-Only 1RM:</strong> If your 1RM is just your bodyweight with no extra
+                        weight, simply enter <strong>0</strong> in the 1RM stats box.</li>
+                    <li><strong>3. Set Current Bodyweight:</strong> Enter your current bodyweight in the "Your
+                        Bodyweight" box. This is crucial for accurate calculations.</li>
+                    <li><strong>4. Use Calculator:</strong> Select an exercise tab (Muscle-Up, Dip, etc.) and enter your
+                        target Reps and RIR to get your recommended training weight.</li>
+                    <li><strong>5. Install for Quick Access:</strong>
+                        <br>• <strong>iPhone:</strong> Tap the <strong>Share</strong> icon (square with an up arrow
+                        <span style="font-size: 1.1rem;">⇯</span>) at the bottom of Safari and select <strong>"Add to
+                            Home Screen"</strong>.
+                        <br>• <strong>Android/Chrome:</strong> Tap the 📥 button at the top or use the browser menu.
                     </li>
                 </ul>
             </div>
@@ -180,7 +203,6 @@
                 </div>
 
                 <p class="subtitle" style="text-align:left; font-size: 0.8rem;">
-                    * Increase weight by 2.5kg after finishing a block.<br>
                     * Primary/Secondary Main Lifts calculated from 1RM Inputs.
                 </p>
 
@@ -218,21 +240,7 @@
 
     </main>
 
-    <!-- Bottom Navigation -->
-    <nav class="main-nav">
-        <a href="#" class="nav-item active" data-target="tab-calculator">
-            <span class="nav-icon">🔢</span>
-            <span>Calculator</span>
-        </a>
-        <a href="#" class="nav-item" data-target="tab-routine">
-            <span class="nav-icon">📋</span>
-            <span>Routine</span>
-        </a>
-        <a href="#" class="nav-item" data-target="tab-workout">
-            <span class="nav-icon" id="workout-emoji">💪🏾</span>
-            <span>Workout</span>
-        </a>
-    </nav>
+    <!-- Bottom Navigation Removed (Moved to Top) -->
 
     <!-- Toast Notification -->
     <div id="toast" class="toast">Notification</div>

@@ -5,7 +5,16 @@ const navItems = document.querySelectorAll('.nav-item');
 const subTabBtns = document.querySelectorAll('.sub-tab-btn');
 const toast = document.getElementById('toast');
 
-// Calculator Elements
+// Navigation & Menu Elements
+const menuToggle = document.getElementById('menu-toggle');
+const menuClose = document.getElementById('menu-close');
+const sideMenu = document.getElementById('side-menu');
+const sideMenuOverlay = document.getElementById('side-menu-overlay');
+const menuItems = document.querySelectorAll('.menu-item');
+const pages = document.querySelectorAll('.page-content');
+const backBtns = document.querySelectorAll('.back-btn');
+
+// Calculator Elements (Page: Calculator)
 const rmInputs = {
     muscleup: document.getElementById('rm-muscleup'),
     dip: document.getElementById('rm-dip'),
@@ -13,31 +22,38 @@ const rmInputs = {
     pullup: document.getElementById('rm-pullup')
 };
 const calcTitle = document.getElementById('calc-title');
-const calcBwInput = document.getElementById('calc-bw');
+const calcBwInput = document.getElementById('calc-bw'); // Now in Get Started
 const calcRepsInput = document.getElementById('calc-reps');
 const calcRirSelect = document.getElementById('calc-rir');
 const btnCalculate = document.getElementById('btn-calculate');
 const resultWeight = document.getElementById('result-weight');
 const resultBreakdown = document.getElementById('result-breakdown');
 
-// Estimate Elements
+// Estimate Elements (Page: Get Started)
 const estWeightInput = document.getElementById('est-weight');
 const estRepsInput = document.getElementById('est-reps');
+const estExerciseSelect = document.getElementById('est-exercise');
 const btnEstimate = document.getElementById('btn-estimate');
 const estResultDiv = document.getElementById('est-result');
 const estValSpan = document.getElementById('est-val');
 
-// Theme Toggle
+// Theme
 const themeToggle = document.getElementById('theme-toggle');
-const workoutEmoji = document.getElementById('workout-emoji');
-const pwaInstallBtn = document.getElementById('pwa-install');
 
-// Routine Elements
+// Routine & Workout Elements
 const routineBlockSelect = document.getElementById('routine-block');
 const routineWeekSelect = document.getElementById('routine-week');
-const routineTableBody = document.getElementById('routine-table-body');
-const workoutSubtitle = document.getElementById('workout-subtitle');
 const workoutDisplay = document.getElementById('workout-display');
+
+// Account Routine Editor Elements
+const routineBlockEdit = document.getElementById('routine-block-edit');
+const routineWeekEdit = document.getElementById('routine-week-edit');
+const routineTableBodyFull = document.getElementById('routine-table-body-full');
+
+// Stats Elements
+const statsBlockSelect = document.getElementById('stats-block');
+const statsWeekSelect = document.getElementById('stats-week');
+const statsLogContainer = document.getElementById('stats-log-container');
 
 // State
 let currentExercise = 'muscleup';
@@ -57,28 +73,20 @@ const rpeToPercent = {
     "6": [86.3, 83.7, 81.1, 78.6, 76.2, 73.9, 70.7, 68.0, 65.3, 62.6]
 };
 
-// Map RIR input values to RPE keys
 const rirToRpeKey = {
-    "0": "10",
-    "0.5": "9.5",
-    "1": "9",
-    "1.5": "8.5",
-    "2": "8",
-    "2.5": "7.5",
-    "3": "7",
-    "3.5": "6.5",
-    "4": "6"
+    "0": "10", "0.5": "9.5", "1": "9", "1.5": "8.5", "2": "8",
+    "2.5": "7.5", "3": "7", "3.5": "6.5", "4": "6"
 };
 
 // --- DATA INITIALIZATION ---
-
+// Same default routine structure as before
 const defaultRoutine = [
     // Block 1
     [
-        ["1x5 + 2x8", "3-4", "3x8", "3-4", "2x2", "3-4", "EMOM3 2-3r", "", "2x8-10", "3", "2x10-15", "3"], // W1
-        ["1x5 + 3x8", "3", "3x8", "3", "3x2", "3", "EMOM4 2-3r", "", "3x8-10", "2", "3x10-15", "2"], // W2
-        ["1x5 + 3x8", "2", "4x7", "3", "3x2", "2", "EMOM5 2-3r", "", "3x8-10", "2", "3x10-15", "2"], // W3
-        ["1x5 + 3x8", "1-0", "4x7", "3", "3x2", "1", "EMOM6 2-3r", "", "3x8-10", "2", "3x10-15", "2"]  // W4
+        ["1x5 + 2x8", "3-4", "3x8", "3-4", "2x2", "3-4", "EMOM3 2-3r", "", "2x8-10", "3", "2x10-15", "3"],
+        ["1x5 + 3x8", "3", "3x8", "3", "3x2", "3", "EMOM4 2-3r", "", "3x8-10", "2", "3x10-15", "2"],
+        ["1x5 + 3x8", "2", "4x7", "3", "3x2", "2", "EMOM5 2-3r", "", "3x8-10", "2", "3x10-15", "2"],
+        ["1x5 + 3x8", "1-0", "4x7", "3", "3x2", "1", "EMOM6 2-3r", "", "3x8-10", "2", "3x10-15", "2"]
     ],
     // Block 2
     [
@@ -116,105 +124,56 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
     initTheme();
     initPWA();
-    initModal(); // Initialize Legal Modal
+    initModal();
     updateCalculatorUI();
-    renderRoutineTable();
+    renderFullRoutineTable(); // Initial Render for default selections
     updateWorkoutDisplay();
+    renderStatsLog(); // Initial Render
 });
 
-// Modal Logic
-function initModal() {
-    const modal = document.getElementById('legal-modal');
-    const trigger = document.getElementById('legal-trigger');
-    const closeBtn = document.querySelector('.close-modal');
+// Navigation Logic
+menuToggle.addEventListener('click', toggleMenu);
+menuClose.addEventListener('click', toggleMenu);
+sideMenuOverlay.addEventListener('click', toggleMenu);
 
-    if (!modal || !trigger) return;
-
-    trigger.addEventListener('click', () => {
-        modal.classList.add('show');
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.classList.remove('show');
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('show');
-        }
-    });
+function toggleMenu() {
+    sideMenu.classList.toggle('active');
+    sideMenuOverlay.classList.toggle('active');
 }
 
-// PWA Logic
-let deferredPrompt;
-
-function initPWA() {
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('SW Registered'))
-            .catch(err => console.log('SW Error', err));
-    }
-
-    // Handle Install Prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
+menuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
         e.preventDefault();
-        deferredPrompt = e;
-        pwaInstallBtn.style.display = 'flex';
+        const pageId = item.getAttribute('data-page');
+        openPage(pageId);
+        toggleMenu(); // Close menu
     });
-
-    // iOS Detection
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS) {
-        // We can't show a button, but we can remind them via a tip
-        console.log("iOS detected: Use Share -> Add to Home Screen");
-    }
-
-    pwaInstallBtn.addEventListener('click', () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    pwaInstallBtn.style.display = 'none';
-                }
-                deferredPrompt = null;
-            });
-        }
-    });
-}
-
-// Theme Logic
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeUI(savedTheme);
-}
-
-themeToggle.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    updateThemeUI(next);
 });
 
-function updateThemeUI(theme) {
-    if (theme === 'light') {
-        themeToggle.textContent = '☀️';
-        workoutEmoji.textContent = '💪🏾';
-    } else {
-        themeToggle.textContent = '🌙';
-        workoutEmoji.textContent = '💪🏻';
-    }
+backBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Hide all pages, effectively returning to the underlying "Main Tabs" view
+        pages.forEach(p => p.classList.remove('active'));
+    });
+});
+
+function openPage(pageId) {
+    pages.forEach(p => {
+        p.classList.remove('active');
+        if (p.id === pageId) p.classList.add('active');
+    });
 }
 
-// Tab Navigation
+// Tab Navigation (Workout vs Stats)
 navItems.forEach(item => {
     item.addEventListener('click', (e) => {
         e.preventDefault();
+
+        // Update nav UI
         navItems.forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
 
+        // Show target tab
         const targetId = item.getAttribute('data-target');
         tabs.forEach(tab => {
             tab.classList.remove('active');
@@ -223,7 +182,7 @@ navItems.forEach(item => {
     });
 });
 
-// Sub Tab Navigation
+// Sub Tab Navigation (Calculator Page)
 subTabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         subTabBtns.forEach(b => b.classList.remove('active'));
@@ -238,46 +197,82 @@ Object.keys(rmInputs).forEach(key => {
     rmInputs[key].addEventListener('input', () => {
         const val = rmInputs[key].value;
         localStorage.setItem(`rm_${key}`, val);
-        updateWorkoutDisplay(); // Recalculate workout if 1RM changes
+        updateWorkoutDisplay();
+        // Also update calc breakdown if visible?
     });
 });
 
-// Calculator Inputs
+// Calculator
 btnCalculate.addEventListener('click', calculateSingle);
 calcBwInput.addEventListener('input', () => {
     localStorage.setItem('bodyweight', calcBwInput.value);
     updateWorkoutDisplay();
 });
 
-// Estimate Logic
+// Estimate 1RM
 btnEstimate.addEventListener('click', () => {
     const w = parseFloat(estWeightInput.value) || 0;
     const r = parseInt(estRepsInput.value) || 0;
     const bw = parseFloat(calcBwInput.value) || 0;
+    const ex = estExerciseSelect.value; // "muscleup" etc.
 
     if (r === 0) {
         showToast('Please enter reps');
         return;
     }
 
-    // 1RM estimate using Brzycki Formula on TOTAL weight
-    const totalWeight = bw + w;
-    const estimatedTotal = totalWeight * (36 / (37 - r));
-    const estimatedAdded = estimatedTotal - bw;
+    let estimated1RM = 0;
 
-    estValSpan.textContent = estimatedAdded.toFixed(1);
+    // Logic dependent on exercise? 
+    // Brzycki: 1RM = Weight / (1.0278 - 0.0278 * Reps)
+    // Or weight * (36 / (37 - r))
+
+    // For Weighted Calisthenics:
+    // If Squat (no BW): Total = Weight
+    // If Pull/Dip (BW): Total = BW + Weight
+
+    let totalWeightUsed = w;
+    if (ex !== 'squat') {
+        if (bw === 0) {
+            showToast('Please enter Bodyweight');
+            return;
+        }
+        totalWeightUsed += bw;
+    }
+
+    // Estimate Total 1RM
+    const estimatedTotal = totalWeightUsed * (36 / (37 - r));
+
+    // Result to save/display (Added Weight)
+    let finalResult = estimatedTotal;
+    if (ex !== 'squat') {
+        finalResult = estimatedTotal - bw;
+    }
+
+    estValSpan.textContent = finalResult.toFixed(2);
     estResultDiv.style.display = 'block';
+
+    // Auto-save to Account?
+    // User said: "The results of 1RM calculations will be included in the exercise slots they correspond to."
+    rmInputs[ex].value = finalResult.toFixed(2);
+    localStorage.setItem(`rm_${ex}`, finalResult.toFixed(2));
+    showToast(`Saved to ${ex} stats!`);
+    updateWorkoutDisplay();
 });
 
-// Routine Selectors
-routineBlockSelect.addEventListener('change', () => {
-    renderRoutineTable();
-    updateWorkoutDisplay();
-});
-routineWeekSelect.addEventListener('change', () => {
-    renderRoutineTable();
-    updateWorkoutDisplay();
-});
+
+// Routine & Stats Selectors
+routineBlockSelect.addEventListener('change', updateWorkoutDisplay);
+routineWeekSelect.addEventListener('change', updateWorkoutDisplay);
+
+// In Account Page: Routine Editor Selectors
+routineBlockEdit.addEventListener('change', renderFullRoutineTable);
+routineWeekEdit.addEventListener('change', renderFullRoutineTable);
+
+// Stats Page Selectors
+statsBlockSelect.addEventListener('change', renderStatsLog);
+statsWeekSelect.addEventListener('change', renderStatsLog);
+
 
 // --- FUNCTIONS ---
 
@@ -311,14 +306,47 @@ function updateCalculatorUI() {
     calcTitle.textContent = `${names[currentExercise]} Calculator`;
 }
 
+// THEME
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeToggleIcon(savedTheme);
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeToggleIcon(theme);
+}
+
+function updateThemeToggleIcon(theme) {
+    if (themeToggle) {
+        themeToggle.textContent = theme === 'light' ? 'L' : 'D';
+    }
+}
+// Add listener to the header toggle as well
+themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+
+// LOGIC: Calculate Single
 function calculateSingle() {
     const addedRM = parseFloat(rmInputs[currentExercise].value) || 0;
     const bodyweight = parseFloat(calcBwInput.value) || 0;
     const reps = parseInt(calcRepsInput.value) || 0;
     const rir = calcRirSelect.value;
 
+    // Squat check
+    const isSquat = currentExercise === 'squat';
+
     if (reps === 0) {
         showToast('Please enter reps');
+        return;
+    }
+    if (!isSquat && bodyweight === 0) {
+        showToast('Enter Bodyweight in Get Started');
         return;
     }
 
@@ -331,120 +359,122 @@ function calculateSingle() {
 
     const percentage = intensities[reps - 1];
 
-    // Total 1RM = Bodyweight + AddedRM
-    const oneRMTotal = bodyweight + addedRM;
-    const targetTotal = oneRMTotal * (percentage / 100);
-    const targetAdded = targetTotal - bodyweight;
+    let targetTotal = 0;
+    let targetAdded = 0;
+
+    if (isSquat) {
+        // Pure weight calculation
+        // 1RM is just the weight on bar
+        targetTotal = addedRM * (percentage / 100);
+        targetAdded = targetTotal; // Display total for squat usually? Or added? User input "Squat (kg)" usually refers to weight on bar for simple squats, OR added weight?
+        // "If I’m 62kg, and I lift 75 of squats, my 1RM is 75" -> 75 is Total.
+        // So addedRM input for squat IS the total weight.
+        resultBreakdown.innerHTML = `Total Load: ${targetTotal.toFixed(2)}kg`;
+    } else {
+        // Bodyweight calculation
+        const oneRMTotal = bodyweight + addedRM;
+        targetTotal = oneRMTotal * (percentage / 100);
+        targetAdded = targetTotal - bodyweight;
+        resultBreakdown.innerHTML = `Total Load: ${targetTotal.toFixed(2)}kg`;
+    }
 
     resultWeight.textContent = targetAdded.toFixed(2);
-    resultBreakdown.innerHTML = `Total Load: ${targetTotal.toFixed(2)}kg`;
 }
 
-function renderRoutineTable() {
-    const block = parseInt(routineBlockSelect.value) - 1;
-    const data = routineData[block];
-    const currentWeekIdx = parseInt(routineWeekSelect.value) - 1;
+// LOGIC: Routine Table Editor (Account Page)
+function renderFullRoutineTable() {
+    const block = parseInt(routineBlockEdit.value) - 1;
+    const week = parseInt(routineWeekEdit.value) - 1;
+    const data = routineData[block][week];
 
-    routineTableBody.innerHTML = '';
+    // Defined Rows mapping to data indices
+    // 0: Dip Main, 2: Dip Sec ... wait.
+    // Data Array Indices:
+    // 0,1: Primary Main (Dip/Squat/Pull)
+    // 2,3: Secondary Main (Paused)
+    // 4,5: Primary MU
+    // 6,7: Secondary MU
+    // 8,9: Assist 1
+    // 10,11: Assist 2
 
-    data.forEach((weekData, weekIndex) => {
+    const rows = [
+        { label: "Primary Muscle-Up", idxSet: 4, idxRir: 5 },
+        { label: "Primary Main Lift (Dip/Squat/Pull)", idxSet: 0, idxRir: 1 },
+        { label: "Secondary Muscle-Up", idxSet: 6, idxRir: 7 },
+        { label: "Secondary Main Lift", idxSet: 2, idxRir: 3 },
+        { label: "Assistance 1", idxSet: 8, idxRir: 9 },
+        { label: "Assistance 2", idxSet: 10, idxRir: 11 },
+    ];
+
+    routineTableBodyFull.innerHTML = '';
+
+    rows.forEach(row => {
         const tr = document.createElement('tr');
-        if (weekIndex === currentWeekIdx) tr.classList.add('active-week');
 
-        // Week Label
-        const tdWeek = document.createElement('td');
-        const weekDiv = document.createElement('div');
-        weekDiv.textContent = `Week ${weekIndex + 1}`;
-
+        // Exercise Column
+        const tdName = document.createElement('td');
+        const nameDiv = document.createElement('div');
+        nameDiv.textContent = row.label;
         const rirDiv = document.createElement('div');
-        rirDiv.textContent = 'RIR';
-        rirDiv.style.fontSize = '0.7rem';
-        rirDiv.style.marginTop = '4px';
-        rirDiv.style.fontWeight = 'bold';
-        // Use color of first RIR cell in row (primary main lift)
-        rirDiv.style.color = 'var(--accent-color)';
+        rirDiv.contentEditable = true;
+        rirDiv.textContent = `RIR ${data[row.idxRir]}`;
+        rirDiv.style.fontWeight = "normal";
+        rirDiv.style.opacity = "0.8";
+        rirDiv.style.fontSize = "0.75rem";
+        rirDiv.onblur = () => {
+            // Extract number from "RIR X" string if user typed that
+            let val = rirDiv.textContent.replace(/RIR/i, '').trim();
+            routineData[block][week][row.idxRir] = val;
+            saveRoutine();
+        };
 
-        tdWeek.appendChild(weekDiv);
-        tdWeek.appendChild(rirDiv);
-        tr.appendChild(tdWeek);
+        tdName.appendChild(nameDiv);
+        tdName.appendChild(rirDiv);
+        tr.appendChild(tdName);
 
-        // Columns: Main, Sec Main, MU, Sec MU, A1, A2
-        // Data index mapping: 
-        // Main: 0(sets) 1(rir)
-        // Sec: 2(sets) 3(rir)
-        // MU: 4(sets) 5(rir)
-        // SecMU: 6(sets) 7(rir)
-        // A1: 8(sets) 9(rir)
-        // A2: 10(sets) 11(rir)
+        // Protocol Column
+        const tdProto = document.createElement('td');
+        const protoDiv = document.createElement('div');
+        protoDiv.contentEditable = true;
+        protoDiv.textContent = data[row.idxSet];
+        protoDiv.style.color = "var(--accent-color)";
+        protoDiv.style.fontWeight = "bold";
+        protoDiv.onblur = () => {
+            routineData[block][week][row.idxSet] = protoDiv.textContent;
+            saveRoutine();
+            // Update workout view if it matches current selection
+            if (routineBlockSelect.value == (block + 1) && routineWeekSelect.value == (week + 1)) {
+                updateWorkoutDisplay();
+            }
+        };
+        tdProto.appendChild(protoDiv);
+        tr.appendChild(tdProto);
 
-        const pairs = [
-            [0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11]
-        ];
-
-        pairs.forEach(pair => {
-            const indexSets = pair[0];
-            const indexRir = pair[1];
-
-            const cellSets = weekData[indexSets];
-            const cellRir = weekData[indexRir];
-
-            const td = document.createElement('td');
-
-            // Create Editable Fields
-            const inputSets = document.createElement('div');
-            inputSets.contentEditable = true;
-            inputSets.textContent = cellSets;
-            inputSets.style.fontWeight = "bold";
-            inputSets.onblur = function () {
-                routineData[block][weekIndex][indexSets] = inputSets.textContent;
-                saveRoutine();
-            };
-
-            const inputRir = document.createElement('div');
-            inputRir.contentEditable = true;
-            inputRir.textContent = cellRir;
-            inputRir.style.fontSize = "0.75rem";
-            inputRir.style.color = "var(--accent-color)";
-            inputRir.onblur = function () {
-                routineData[block][weekIndex][indexRir] = inputRir.textContent;
-                saveRoutine();
-            };
-
-            td.appendChild(inputSets);
-            td.appendChild(inputRir);
-            tr.appendChild(td);
-        });
-
-        routineTableBody.appendChild(tr);
+        routineTableBodyFull.appendChild(tr);
     });
 }
 
 function saveRoutine() {
     localStorage.setItem('routineData', JSON.stringify(routineData));
-    updateWorkoutDisplay();
 }
 
-// Helper to calculate weight
-// Returns an array of objects for multi-part sets: [{protocol: "1x2", weight: "18.3"}, {protocol: "2x5", weight: "11.1"}]
-function getWeightDetails(exName, setString, rirString, isSecondary = false) {
+// LOGIC: Weight Calculation Helper
+function getWeightDetails(exKey, setString, rirString, isSecondary = false) {
     const bodyweightInput = document.getElementById('calc-bw');
     const bw = parseFloat(bodyweightInput.value) || 0;
-    const addedRM = parseFloat(rmInputs[exName].value) || 0;
-    const oneRMTotal = bw + addedRM;
+    const addedRM = parseFloat(rmInputs[exKey].value) || 0;
 
-    if (oneRMTotal === 0) return [{ protocol: setString, weight: "1RM?", rir: rirString }];
+    // Squat Fix: If squat, OneRMTotal IS the addedRM (which represents total).
+    // Else, OneRMTotal = bw + addedRM
+    let oneRMTotal = bw + addedRM;
+    if (exKey === 'squat') oneRMTotal = addedRM;
 
-    // Split "1x2 + 2x5" into parts
+    if (oneRMTotal === 0) return [{ protocol: setString, weight: "?", rir: rirString }];
+
     const parts = setString.split('+').map(p => p.trim());
     const results = [];
 
     parts.forEach(part => {
-        // More robust rep parsing
-        // Case: "1x5" -> 5
-        // Case: "5" -> 5
-        // Case: "2x10-15" -> 15 (assume higher for percentage)
-        // Case: "EMOM3 2r" -> 2
-
         let reps = 0;
         const repsMatch = part.match(/(\d+)$/) || part.match(/x(\d+)/);
         if (repsMatch) {
@@ -455,7 +485,6 @@ function getWeightDetails(exName, setString, rirString, isSecondary = false) {
         }
 
         if (reps === 0 || isNaN(reps)) {
-            // Check for Cluster
             if (part.toLowerCase().includes('cluster')) {
                 const clusterMatch = part.match(/(\d+)\+(\d+)/);
                 if (clusterMatch) reps = parseInt(clusterMatch[1]) + parseInt(clusterMatch[2]);
@@ -467,11 +496,9 @@ function getWeightDetails(exName, setString, rirString, isSecondary = false) {
             return;
         }
 
-        // Parse RIR "3-4" -> use average or lower end
         const rirMatch = rirString.match(/(\d+(\.\d+)?)/);
         const rirVal = rirMatch ? parseFloat(rirMatch[0]) : 3;
 
-        // Map RIR to RPE
         let rpeEst = 10 - rirVal;
         rpeEst = Math.round(rpeEst * 2) / 2;
         if (rpeEst < 6) rpeEst = 6;
@@ -485,13 +512,23 @@ function getWeightDetails(exName, setString, rirString, isSecondary = false) {
             weightText = "Light";
         } else {
             let intensity = arr[reps - 1];
-            let totalLoad = oneRMTotal * (intensity / 100);
-            if (isSecondary) totalLoad *= 0.90;
 
-            const addedLoad = totalLoad - bw;
-            // No rounding as requested: "Keep them exactly as in the Calculator tab"
-            // Actually, keep 1 or 2 decimals for readability but don't "round up" to nearest 2.5
-            weightText = addedLoad.toFixed(2);
+            // Secondary Logic: User said "too high".
+            // Previous was * 0.90. Let's try * 0.85 approx (-15%).
+            // Or better: Simulate a higher RIR? 
+            // Just drop percentage.
+            if (isSecondary) intensity = intensity * 0.88;
+
+            let totalLoad = oneRMTotal * (intensity / 100);
+
+            let finalLoad = 0;
+            if (exKey === 'squat') {
+                finalLoad = totalLoad;
+            } else {
+                finalLoad = totalLoad - bw;
+            }
+
+            weightText = finalLoad.toFixed(2);
         }
 
         results.push({ protocol: part, weight: weightText, rir: rirString });
@@ -500,30 +537,27 @@ function getWeightDetails(exName, setString, rirString, isSecondary = false) {
     return results;
 }
 
+// LOGIC: Workout Display
 function updateWorkoutDisplay() {
-    console.log("Updating Workout Display...");
     const block = parseInt(routineBlockSelect.value);
     const week = parseInt(routineWeekSelect.value);
 
-    workoutSubtitle.textContent = `Target for Block ${block}, Week ${week}`;
     workoutDisplay.innerHTML = '';
 
     const weekData = routineData[block - 1][week - 1];
 
-    // --- PRIMARY LIFTS SECTION ---
+    // Primary
     const primaryTitle = document.createElement('div');
     primaryTitle.className = 'workout-section-title';
     primaryTitle.textContent = "Primary Lifts";
     workoutDisplay.appendChild(primaryTitle);
 
-    // Primary Muscle Up
     createExerciseCard("Muscle-Up", "muscleup", weekData[4], weekData[5], false);
-    // Primary Main Lifts
     createExerciseCard("Dip", "dip", weekData[0], weekData[1], false);
     createExerciseCard("Squat", "squat", weekData[0], weekData[1], false);
     createExerciseCard("Pull-Up", "pullup", weekData[0], weekData[1], false);
 
-    // --- SECONDARY LIFTS SECTION ---
+    // Secondary
     const secondaryTitle = document.createElement('div');
     secondaryTitle.className = 'workout-section-title';
     secondaryTitle.textContent = "Secondary Lifts";
@@ -533,12 +567,10 @@ function updateWorkoutDisplay() {
     secondaryNote.className = 'section-desc';
     secondaryNote.style.textAlign = 'left';
     secondaryNote.style.marginBottom = '1.5rem';
-    secondaryNote.innerHTML = "* Secondary lifts are calculated with a <strong>10% decrease</strong> in intensity to focus on technique and recovery.";
+    secondaryNote.innerHTML = "* Secondary lifts are calculated with reduced intensity to focus on technique.";
     workoutDisplay.appendChild(secondaryNote);
 
-    // Secondary Muscle Up (EMOM or Cluster)
     createExerciseCard("EMOM Muscle-Ups", "muscleup", weekData[6], weekData[7], true);
-    // Secondary Main Lifts (Paused Variations)
     createExerciseCard("Paused Dips", "dip", weekData[2], weekData[3], true);
     createExerciseCard("Paused Squats", "squat", weekData[2], weekData[3], true);
     createExerciseCard("Paused Pull-Ups", "pullup", weekData[2], weekData[3], true);
@@ -550,38 +582,26 @@ function createExerciseCard(title, exKey, sets, rir, isSec) {
     const el = document.createElement('div');
     el.className = 'workout-exercise';
 
-    // RIR processing for intensity label
-    let rirText = rir || "0";
-    let intensityLabel = "Heavy";
-    const rirMatch = rirText.match(/(\d+)/);
-    const rirVal = rirMatch ? parseInt(rirMatch[0]) : 3;
-
-    if (rirVal <= 1) intensityLabel = "Very Heavy";
-    else if (rirVal <= 2) intensityLabel = "Heavy";
-    else if (rirVal <= 3) intensityLabel = "Moderate";
-    else intensityLabel = "Light";
-
-    const details = getWeightDetails(exKey, sets, rirText, isSec);
+    const details = getWeightDetails(exKey, sets, rir, isSec);
 
     let detailsHtml = "";
     details.forEach(d => {
         let weightDisplay = d.weight;
         if (!isNaN(parseFloat(weightDisplay))) {
             const w = parseFloat(weightDisplay);
-            // If exactly 0, just "0"
-            if (Math.abs(w) < 0.01) weightDisplay = "BW (0)";
-            else weightDisplay = w.toFixed(2); // Match calculator formatting
+            if (Math.abs(w) < 0.01 && exKey !== 'squat') weightDisplay = "BW";
+            else weightDisplay = w.toFixed(2);
         }
 
         detailsHtml += `
             <div class="exercise-details">
                 <div class="detail-item">
-                    <span class="detail-label">Protocol</span>
+                    <span class="detail-label">Sets/Reps</span>
                     <span class="detail-value" style="font-size:1rem">${d.protocol}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Target RIR</span>
-                    <span class="detail-value" style="font-size:1rem">${rirText}</span>
+                    <span class="detail-value" style="font-size:1rem">${d.rir}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Target Weight</span>
@@ -594,15 +614,81 @@ function createExerciseCard(title, exKey, sets, rir, isSec) {
     el.innerHTML = `
         <div class="exercise-header">
             <span class="exercise-name">${title}</span>
-            <span class="exercise-tag">${intensityLabel}</span>
         </div>
         ${detailsHtml}
     `;
     workoutDisplay.appendChild(el);
 }
 
+// LOGIC: Stats Log (Basic Implementation)
+function renderStatsLog() {
+    const block = parseInt(statsBlockSelect.value);
+    const week = parseInt(statsWeekSelect.value);
+
+    // Ideally this would check for *saved* stats logic. For now, we generate inputs.
+    // To make it simple, we will list the main exercises and a place to write what was done.
+
+    statsLogContainer.innerHTML = '';
+
+    const exercises = ["Muscle-Up", "Dip", "Squat", "Pull-Up"];
+
+    exercises.forEach(ex => {
+        const card = document.createElement('div');
+        card.className = 'glass';
+        card.style.marginBottom = '1rem';
+        card.innerHTML = `
+            <h3>${ex}</h3>
+            <div class="routine-controls">
+                <div class="input-group">
+                    <label>Weight Used</label>
+                    <input type="text" placeholder="e.g. 20kg">
+                </div>
+                <div class="input-group">
+                    <label>Reps Performance</label>
+                    <input type="text" placeholder="e.g. 5, 5, 4">
+                </div>
+            </div>
+         `;
+        statsLogContainer.appendChild(card);
+    });
+}
+
+
+// Legal Modal
+function initModal() {
+    const modal = document.getElementById('legal-modal');
+    const trigger = document.getElementById('legal-trigger');
+    const closeBtn = document.querySelector('.close-modal');
+
+    if (!modal || !trigger) return;
+
+    trigger.addEventListener('click', () => {
+        modal.classList.add('show');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.remove('show');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+}
+
+function initPWA() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Error', err));
+    }
+}
+
 function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 }

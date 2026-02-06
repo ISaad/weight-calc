@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>StreetLift Pro | Premium Streetlifting Performance</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,81 +25,209 @@
         <div class="blob blob-2"></div>
     </div>
 
+    <!-- Header -->
     <header class="container">
         <div class="header-top">
             <div class="header-main">
                 <h1>STREETLIFT <span class="accent-text">PRO</span></h1>
                 <div class="header-controls">
-                    <button id="pwa-install" class="theme-btn" style="display: none;" title="Install App">📥</button>
-                    <button id="theme-toggle" class="theme-btn">🌙</button>
+                    <button id="menu-toggle" class="theme-btn"
+                        style="width: auto; padding: 0 12px; border-radius: 12px; font-size: 0.8rem;">MENU</button>
+                    <!-- Keeping Theme Toggle here for now as requested -->
+                    <button id="theme-toggle" class="theme-btn">D</button>
                 </div>
             </div>
-            <p class="subtitle">Built for Streetlifters</p>
 
-            <!-- Moved Navigation from bottom to top -->
+            <!-- Main Tabs Navigation -->
             <nav class="main-nav-top">
-                <a href="#" class="nav-item active" data-target="tab-calculator">
-                    <span class="nav-icon">🔢</span>
-                    <span>Calculator</span>
+                <a href="#" class="nav-item active" data-target="tab-workout">
+                    <span>WORKOUT</span>
                 </a>
-                <a href="#" class="nav-item" data-target="tab-routine">
-                    <span class="nav-icon">📋</span>
-                    <span>Routine</span>
-                </a>
-                <a href="#" class="nav-item" data-target="tab-workout">
-                    <span class="nav-icon" id="workout-emoji">💪🏾</span>
-                    <span>Workout</span>
+                <a href="#" class="nav-item" data-target="tab-stats">
+                    <span>STATS</span>
                 </a>
             </nav>
         </div>
     </header>
 
+    <!-- Side Menu Overlay -->
+    <div id="side-menu-overlay" class="menu-overlay"></div>
+    <div id="side-menu" class="side-menu">
+        <div class="menu-header">
+            <h2>Menu</h2>
+            <button id="menu-close" class="close-btn">&times;</button>
+        </div>
+        <div class="menu-items">
+            <a href="#" class="menu-item" data-page="page-get-started">Get Started</a>
+            <a href="#" class="menu-item" data-page="page-account">Account</a>
+            <a href="#" class="menu-item" data-page="page-calculator">Calculator</a>
+            <a href="#" class="menu-item" data-page="page-contact">Contact Us</a>
+            <a href="#" class="menu-item" data-page="page-credits">Credits</a>
+            <a href="#" class="menu-item" data-page="page-theme">Theme</a>
+        </div>
+    </div>
+
     <main class="container">
 
-        <!-- TAB 1: CALCULATOR -->
-        <section id="tab-calculator" class="tab-content active">
+        <!-- ================= PAGES (From Menu) ================= -->
 
-            <!-- 1RM Inputs -->
-            <h2>Your 1RM Stats</h2>
-            <p class="section-desc">* Increase weight by 2.5kg after successfully finishing a block.</p>
-            <div class="rm-tracker glass">
-                <div class="rm-input-group">
-                    <label for="rm-muscleup">Muscle-Up (kg)</label>
-                    <input type="number" id="rm-muscleup" placeholder="0" step="1.25">
+        <!-- PAGE: GET STARTED -->
+        <div id="page-get-started" class="page-content">
+            <div class="page-header">
+                <button class="back-btn">← Back</button>
+                <h2>Get Started</h2>
+            </div>
+
+            <div class="glass">
+                <h3>Welcome, Agnese!</h3>
+                <p class="subtitle" style="text-align: left;">Your strength, precisely scaled.</p>
+                <p style="margin-top: 1rem;">StreetLift Pro is personalised to your unique fitness journey, helping you
+                    track your progress in weighted calisthenics and adapt your training to your goals. Let's get you
+                    set up.</p>
+            </div>
+
+            <div class="glass">
+                <h3>Key Concepts</h3>
+                <ul class="concept-list">
+                    <li><strong class="accent-text">StreetLift:</strong> Competitive weighted calisthenics (Pull-up,
+                        Dip, Muscle-up, Squat).</li>
+                    <li><strong class="accent-text">1RM (One Rep Max):</strong> The maximum weight you can lift for one
+                        repetition.</li>
+                    <li><strong class="accent-text">RIR (Reps In Reserve):</strong> How many more reps you
+                        <em>could</em> have done with good form. (e.g., RIR 2 means you stopped 2 reps before failure).
+                    </li>
+                    <li><strong class="accent-text">RPE (Rate of Perceived Exertion):</strong> 1-10 scale of intensity.
+                        10 is max effort (RIR 0).</li>
+                </ul>
+            </div>
+
+            <!-- Estimate 1RM Module (Moved Here) -->
+            <div class="glass" id="estimate-section">
+                <h3>Don't know your 1RM yet? Calculate it here!</h3>
+                <div class="routine-controls">
+                    <div class="input-group">
+                        <label>Exercise</label>
+                        <select id="est-exercise">
+                            <option value="muscleup">Muscle-Up</option>
+                            <option value="dip">Dip</option>
+                            <option value="squat">Squat</option>
+                            <option value="pullup">Pull-Up</option>
+                        </select>
+                    </div>
+                    <!-- Added Bodyweight Section Here -->
+                    <div class="input-group">
+                        <label>Your Bodyweight (kg)</label>
+                        <input type="number" id="calc-bw" placeholder="e.g. 62">
+                    </div>
                 </div>
-                <div class="rm-input-group">
-                    <label for="rm-dip">Dip (kg)</label>
-                    <input type="number" id="rm-dip" placeholder="0" step="1.25">
+                <div class="routine-controls">
+                    <div class="input-group">
+                        <label>Added Weight</label>
+                        <input type="number" id="est-weight" placeholder="+10 or -14">
+                    </div>
+                    <div class="input-group">
+                        <label>Reps Done</label>
+                        <input type="number" id="est-reps" placeholder="5">
+                    </div>
                 </div>
-                <div class="rm-input-group">
-                    <label for="rm-squat">Squat (kg)</label>
-                    <input type="number" id="rm-squat" placeholder="0" step="1.25">
+                <button class="btn btn-secondary" id="btn-estimate">Estimate 1RM</button>
+
+                <div id="est-result" class="result-sub" style="margin-top: 1rem; display: none;">
+                    <p>Estimated 1RM: <span id="est-val" class="accent-text">--</span> kg</p>
+                    <p style="font-size: 0.8rem; margin-top:0.5rem; opacity: 0.8;">This result will be saved to your
+                        Account stats automatically.</p>
                 </div>
-                <div class="rm-input-group">
-                    <label for="rm-pullup">Pull-Up (kg)</label>
-                    <input type="number" id="rm-pullup" placeholder="0" step="1.25">
+            </div>
+        </div>
+
+        <!-- PAGE: ACCOUNT -->
+        <div id="page-account" class="page-content">
+            <div class="page-header">
+                <button class="back-btn">← Back</button>
+                <h2>Account</h2>
+            </div>
+
+            <!-- 1RM Stats (Editable) -->
+            <div class="glass">
+                <h3>Your 1RM Stats</h3>
+                <div class="rm-tracker">
+                    <div class="rm-input-group">
+                        <label for="rm-muscleup">Muscle-Up (kg)</label>
+                        <input type="number" id="rm-muscleup" placeholder="0" step="1.25">
+                    </div>
+                    <div class="rm-input-group">
+                        <label for="rm-dip">Dip (kg)</label>
+                        <input type="number" id="rm-dip" placeholder="0" step="1.25">
+                    </div>
+                    <div class="rm-input-group">
+                        <label for="rm-squat">Squat (kg)</label>
+                        <input type="number" id="rm-squat" placeholder="0" step="1.25">
+                    </div>
+                    <div class="rm-input-group">
+                        <label for="rm-pullup">Pull-Up (kg)</label>
+                        <input type="number" id="rm-pullup" placeholder="0" step="1.25">
+                    </div>
                 </div>
             </div>
 
-            <!-- Central Bodyweight Section -->
-            <div class="bw-section glass">
-                <div class="input-group">
-                    <label for="calc-bw">Your Bodyweight (kg)</label>
-                    <input type="number" id="calc-bw" placeholder="e.g. 62">
+            <!-- Full Routine Table -->
+            <div class="glass">
+                <h3>Full Routine</h3>
+                <div class="routine-controls">
+                    <div class="input-group">
+                        <label>Block</label>
+                        <select id="routine-block-edit">
+                            <option value="1">Block 1</option>
+                            <option value="2">Block 2</option>
+                            <option value="3">Block 3</option>
+                            <option value="4">Block 4</option>
+                            <option value="5">Block 5</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Week</label>
+                        <select id="routine-week-edit">
+                            <option value="1">Week 1</option>
+                            <option value="2">Week 2</option>
+                            <option value="3">Week 3</option>
+                            <option value="4">Week 4</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="routine-table-full">
+                        <thead>
+                            <tr>
+                                <th>Exercise <br><span style="font-size:0.7em; font-weight:normal;">(RIR)</span></th>
+                                <th>Protocol</th>
+                            </tr>
+                        </thead>
+                        <tbody id="routine-table-body-full">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Sub Tabs for Exercises -->
-            <div class="sub-tabs">
+        <!-- PAGE: CALCULATOR -->
+        <div id="page-calculator" class="page-content">
+            <div class="page-header">
+                <button class="back-btn">← Back</button>
+                <h2>Calculator</h2>
+            </div>
+
+            <!-- Moved Calculator Content Here -->
+            <div class="sub-tabs" style="justify-content: center;">
                 <button class="sub-tab-btn active" data-ex="muscleup">Muscle-Up</button>
                 <button class="sub-tab-btn" data-ex="dip">Dip</button>
                 <button class="sub-tab-btn" data-ex="squat">Squat</button>
                 <button class="sub-tab-btn" data-ex="pullup">Pull-Up</button>
             </div>
 
-            <!-- The Calculator Module -->
             <div class="glass">
-                <div class="exercise-header">
+                <div class="exercise-header" style="justify-content: center;">
                     <h3 id="calc-title">Muscle-Up Calculator</h3>
                 </div>
 
@@ -134,56 +262,100 @@
                 </div>
             </div>
 
-            <!-- Estimate 1RM Section -->
-            <div class="glass" id="estimate-section">
-                <h3>Don't know your 1RM yet? Calculate it here!</h3>
+            <p class="section-desc" style="text-align: left;">* Increase weight by 2.5kg after successfully finishing a
+                block.</p>
+        </div>
+
+        <!-- PAGE: CONTACT -->
+        <div id="page-contact" class="page-content">
+            <div class="page-header">
+                <button class="back-btn">← Back</button>
+                <h2>Contact Us</h2>
+            </div>
+            <div class="glass">
+                <p>Have feedback, found a bug, or just want to report an issue?</p>
+                <a href="mailto:support@streetliftpro.com" class="btn btn-primary"
+                    style="margin-top: 1rem; text-decoration: none;">Email Us</a>
+            </div>
+        </div>
+
+        <!-- PAGE: CREDITS -->
+        <div id="page-credits" class="page-content">
+            <div class="page-header">
+                <button class="back-btn">← Back</button>
+                <h2>Credits</h2>
+            </div>
+            <div class="glass">
+                <p style="margin-bottom: 1rem;"><strong>Who we are</strong></p>
+                <p>We are a team of streetlifting enthusiasts who want to offer the best possible product for the
+                    community, because we use it ourselves.</p>
+                <br>
+                <p class="footer-main-text">StreetLift Pro</p>
+                <p style="margin-top:0.5rem"><strong>Concept & Product:</strong> Agnese</p>
+                <p><strong>Development:</strong> Ismael</p>
+                <p><strong>Methodology:</strong> Inspired by Gabriel, Agnese, and Micha Schulz.</p>
+            </div>
+        </div>
+
+        <!-- PAGE: THEME -->
+        <div id="page-theme" class="page-content">
+            <div class="page-header">
+                <button class="back-btn">← Back</button>
+                <h2>Theme</h2>
+            </div>
+            <div class="glass">
                 <div class="routine-controls">
-                    <div class="input-group">
-                        <label>Added Weight</label>
-                        <input type="number" id="est-weight" placeholder="+10 or -14">
-                    </div>
-                    <div class="input-group">
-                        <label>Reps Done</label>
-                        <input type="number" id="est-reps" placeholder="5">
-                    </div>
+                    <label>Select Mode</label>
                 </div>
-                <button class="btn btn-secondary" id="btn-estimate">Estimate 1RM</button>
-                <div id="est-result" class="result-sub" style="margin-top: 1rem; font-weight: bold; display: none;">
-                    Estimated 1RM (Added): <span id="est-val" class="accent-text">--</span> kg
+                <div class="routine-controls">
+                    <button class="btn btn-secondary" onclick="setTheme('light')">Light Mode</button>
+                    <button class="btn btn-secondary" onclick="setTheme('dark')">Dark Mode</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= MAIN TABS ================= -->
+
+        <!-- TAB: WORKOUT (HOME) -->
+        <section id="tab-workout" class="tab-content active">
+            <h2>This Week's Workout</h2>
+
+            <div class="routine-controls">
+                <div class="input-group">
+                    <label>Block</label>
+                    <select id="routine-block">
+                        <option value="1">Block 1</option>
+                        <option value="2">Block 2</option>
+                        <option value="3">Block 3</option>
+                        <option value="4">Block 4</option>
+                        <option value="5">Block 5</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Week</label>
+                    <select id="routine-week">
+                        <option value="1">Week 1</option>
+                        <option value="2">Week 2</option>
+                        <option value="3">Week 3</option>
+                        <option value="4">Week 4</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- How to Use Section -->
-            <div class="glass how-to-use">
-                <h3>How to Use</h3>
-                <ul>
-                    <li><strong>1. Enter 1RM Stats:</strong> In the boxes above, put the weight you added to your
-                        bodyweight (e.g. 20) or assisted weight (using a minus sign, e.g. -14).</li>
-                    <li><strong>2. Bodyweight-Only 1RM:</strong> If your 1RM is just your bodyweight with no extra
-                        weight, simply enter <strong>0</strong> in the 1RM stats box.</li>
-                    <li><strong>3. Set Current Bodyweight:</strong> Enter your current bodyweight in the "Your
-                        Bodyweight" box. This is crucial for accurate calculations.</li>
-                    <li><strong>4. Use Calculator:</strong> Select an exercise tab (Muscle-Up, Dip, etc.) and enter your
-                        target Reps and RIR to get your recommended training weight.</li>
-                    <li><strong>5. Install for Quick Access:</strong>
-                        <br>• <strong>iPhone:</strong> Tap the <strong>Share</strong> icon (square with an up arrow
-                        <span style="font-size: 1.1rem;">⇯</span>) at the bottom of Safari and select <strong>"Add to
-                            Home Screen"</strong>.
-                        <br>• <strong>Android/Chrome:</strong> Tap the 📥 button at the top or use the browser menu.
-                    </li>
-                </ul>
+            <div id="workout-display">
+                <!-- Populated by JS -->
             </div>
         </section>
 
-
-        <!-- TAB 2: ROUTINE -->
-        <section id="tab-routine" class="tab-content">
-            <h2>Training Routine</h2>
+        <!-- TAB: STATS (NEW) -->
+        <section id="tab-stats" class="tab-content">
+            <h2>Verified Sets</h2>
             <div class="glass">
                 <div class="routine-controls">
                     <div class="input-group">
-                        <label>Current Block</label>
-                        <select id="routine-block">
+                        <label>Block</label>
+                        <select id="stats-block">
                             <option value="1">Block 1</option>
                             <option value="2">Block 2</option>
                             <option value="3">Block 3</option>
@@ -192,8 +364,8 @@
                         </select>
                     </div>
                     <div class="input-group">
-                        <label>Current Week</label>
-                        <select id="routine-week">
+                        <label>Week</label>
+                        <select id="stats-week">
                             <option value="1">Week 1</option>
                             <option value="2">Week 2</option>
                             <option value="3">Week 3</option>
@@ -202,39 +374,11 @@
                     </div>
                 </div>
 
-                <p class="subtitle" style="text-align:left; font-size: 0.8rem;">
-                    * Primary/Secondary Main Lifts calculated from 1RM Inputs.
-                </p>
-
-                <div class="table-wrapper">
-                    <table id="routine-table">
-                        <thead>
-                            <tr>
-                                <th>Week</th>
-                                <th>Primary Main Lift</th>
-                                <th>Secondary Main Lift</th>
-                                <th>Primary Muscle Up</th>
-                                <th>Secondary Muscle Up</th>
-                                <th>Assistance 1</th>
-                                <th>Assistance 2</th>
-                            </tr>
-                        </thead>
-                        <tbody id="routine-table-body">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
+                <div id="stats-log-container">
+                    <!-- Dynamic inputs for sets -->
+                    <p style="text-align:center; padding: 2rem; color: var(--text-secondary);">Select a week to log your
+                        completed sets.</p>
                 </div>
-            </div>
-        </section>
-
-
-        <!-- TAB 3: WORKOUT -->
-        <section id="tab-workout" class="tab-content">
-            <h2>This Week's Workout</h2>
-            <p class="subtitle" id="workout-subtitle">Based on Block 1, Week 1</p>
-
-            <div id="workout-display">
-                <!-- Populated by JS -->
             </div>
         </section>
 
@@ -242,13 +386,7 @@
 
     <footer>
         <div class="footer-content">
-            <div class="footer-credits">
-                <p class="footer-main-text">© 2026 StreetLift Pro</p>
-                <p><strong>Concept & Product Architecture:</strong> Agnese</p>
-                <p><strong>Training Methodology:</strong> based on the work of Gabriel and Agnese, and inspired by Micha
-                    Schulz</p>
-                <p><strong>Technical Development:</strong> Ismael</p>
-            </div>
+            <p class="footer-main-text">© 2026 StreetLift Pro</p>
             <div class="footer-links">
                 <a class="footer-link" id="legal-trigger">Legal Notice & Privacy</a>
             </div>
@@ -262,21 +400,10 @@
             <h2>Legal Notice & Privacy</h2>
             <div class="modal-text">
                 <p><strong>StreetLift Pro</strong> is a performance tracking tool designed for the streetlifting
-                    community. By using this application, you agree to the following terms:</p>
-
-                <p><strong>Data Privacy:</strong> We value your privacy. This application is a client-side tool.
-                    <strong>All data you enter</strong> (including 1RM stats, bodyweight, and routine progress)
-                    <strong>is stored locally in your browser's Local Storage.</strong></p>
-
-                <p><strong>No Data Collection:</strong> We do not collect, transmit, or share any of your personal data
-                    or workout logs with any external servers or third parties. Your data stays on your device.</p>
-
-                <p><strong>Data Control:</strong> You have full control over your data. You can delete all stored
-                    information at any time by clearing your browser's site data or history for this website.</p>
-
-                <p><strong>Disclaimer:</strong> The training methodology and weight recommendations are tools to assist
-                    your training. Use them responsibly and at your own risk. Always prioritize safety and proper form.
+                    community.</p>
+                <p><strong>Data Privacy:</strong> All data you enter is stored locally in your browser's Local Storage.
                 </p>
+                <p><strong>No Data Collection:</strong> We do not collect any personal data.</p>
             </div>
         </div>
     </div>
@@ -284,7 +411,7 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast">Notification</div>
 
-    <script src="script.js?v=2.0"></script>
+    <script src="script.js?v=3.0"></script>
 </body>
 
 </html>
